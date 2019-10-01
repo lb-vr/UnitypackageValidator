@@ -3,5 +3,5 @@
 # ルールファイルが外部に存在する場合は、そのファイルパスかURLを指定する
 [rule]
 url = ""
-filepath = ""
+filepath = "rule.json"
 

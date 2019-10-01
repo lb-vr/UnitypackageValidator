@@ -1,0 +1,497 @@
+{
+    "00689565905a91443932ed9b91bac11c": {
+        "guid": "00689565905a91443932ed9b91bac11c",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/Matcap.jpg",
+        "type": "kTexture"
+    },
+    "085cf3fedd6bb294eacfbd4bc414ff86": {
+        "guid": "085cf3fedd6bb294eacfbd4bc414ff86",
+        "path": "Assets/arktoon Shaders/Examples/ExampleScene/Lightmap-0_comp_dir.png",
+        "type": "kTexture"
+    },
+    "0d892e826f730774797c3acfca1b43db": {
+        "guid": "0d892e826f730774797c3acfca1b43db",
+        "path": "Assets/arktoon Shaders/Shaders/StencilReaderDoubleFadeFade.shader",
+        "type": "kShader"
+    },
+    "0ec5b0f7100c48f458dcf280614787a1": {
+        "guid": "0ec5b0f7100c48f458dcf280614787a1",
+        "path": "Assets/arktoon Shaders/Examples/ExampleScene/ReflectionProbe-0.exr",
+        "type": "kUnknown"
+    },
+    "112ba1c1df66b5e47b93c5c355fb8e69": {
+        "guid": "112ba1c1df66b5e47b93c5c355fb8e69",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/material 10.mat",
+        "type": "kMaterial"
+    },
+    "119d5edced9d6bf469181f8497c65731": {
+        "guid": "119d5edced9d6bf469181f8497c65731",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/material 4.mat",
+        "type": "kMaterial"
+    },
+    "12f178d108ab0394aa4ed4acf1bad8cb": {
+        "guid": "12f178d108ab0394aa4ed4acf1bad8cb",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/ShadeCap.png",
+        "type": "kTexture"
+    },
+    "130e4ea006e957749a3e19016c5b918a": {
+        "guid": "130e4ea006e957749a3e19016c5b918a",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/EmissiveFreak/EmissiveFreakMaterial 1.mat",
+        "type": "kMaterial"
+    },
+    "18d9a7533c199e740aace730c78d6c60": {
+        "guid": "18d9a7533c199e740aace730c78d6c60",
+        "path": "Assets/arktoon Shaders/Shaders/EmissiveFreakCutout.shader",
+        "type": "kShader"
+    },
+    "19a0ba3d86e749546b76bf5acf5d16ea": {
+        "guid": "19a0ba3d86e749546b76bf5acf5d16ea",
+        "path": "Assets/arktoon Shaders/Examples/Objects/roundedCube.mqo",
+        "type": "kUnknown"
+    },
+    "1aa4298ba3c990640b49f39565933fb9": {
+        "guid": "1aa4298ba3c990640b49f39565933fb9",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/mannequin-knit",
+        "type": "kDir"
+    },
+    "1b5146a1f3281774a9ae9d86d85b7cb0": {
+        "guid": "1b5146a1f3281774a9ae9d86d85b7cb0",
+        "path": "Assets/arktoon Shaders/Examples/Objects/mannequin.fbx",
+        "type": "kUnknown"
+    },
+    "1bd6ae9520d378f408445f9d4124d0f7": {
+        "guid": "1bd6ae9520d378f408445f9d4124d0f7",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/ShadeCap-Soft.png",
+        "type": "kTexture"
+    },
+    "1dc24fdcb830de545be12a31d953349b": {
+        "guid": "1dc24fdcb830de545be12a31d953349b",
+        "path": "Assets/arktoon Shaders/Editor/ArktoonInspector.cs",
+        "type": "kUnknown"
+    },
+    "225caa08e8b8e3747981f424d343ea75": {
+        "guid": "225caa08e8b8e3747981f424d343ea75",
+        "path": "Assets/arktoon Shaders/Examples/Objects",
+        "type": "kDir"
+    },
+    "24eaadc58de76f74085bddf9621fe48a": {
+        "guid": "24eaadc58de76f74085bddf9621fe48a",
+        "path": "Assets/arktoon Shaders/Shaders/EmissiveFreakStencilWriter.shader",
+        "type": "kShader"
+    },
+    "2535c9c47d22fa74cb975bc6bf822ac7": {
+        "guid": "2535c9c47d22fa74cb975bc6bf822ac7",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/MaskExample2.jpg",
+        "type": "kTexture"
+    },
+    "25bd5054a4b6ffb47b73f6fd436e0f56": {
+        "guid": "25bd5054a4b6ffb47b73f6fd436e0f56",
+        "path": "Assets/arktoon Shaders/README_ja.txt",
+        "type": "kUnknown"
+    },
+    "27f323571b8327e409c9b9669fb84d93": {
+        "guid": "27f323571b8327e409c9b9669fb84d93",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/material 11.mat",
+        "type": "kMaterial"
+    },
+    "2eb350b0dd339cb49b9824cf13995641": {
+        "guid": "2eb350b0dd339cb49b9824cf13995641",
+        "path": "Assets/arktoon Shaders/Examples/Objects/cloth-sample.fbx",
+        "type": "kUnknown"
+    },
+    "2f2236791569d124eb4b48f19730cb06": {
+        "guid": "2f2236791569d124eb4b48f19730cb06",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/material 5.mat",
+        "type": "kMaterial"
+    },
+    "300593a09f3a3a847a5286da9417f56e": {
+        "guid": "300593a09f3a3a847a5286da9417f56e",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/mannequin-knit/mannequin_hada_Normal.png",
+        "type": "kTexture"
+    },
+    "345659f361c837b4cab35176f8c8d671": {
+        "guid": "345659f361c837b4cab35176f8c8d671",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/material 7.mat",
+        "type": "kMaterial"
+    },
+    "358ad584c99802b4da2965f294fdfe92": {
+        "guid": "358ad584c99802b4da2965f294fdfe92",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/EmissiveFreak/grdient_top.png",
+        "type": "kTexture"
+    },
+    "367c23b196b1f6749a03f63febbeb990": {
+        "guid": "367c23b196b1f6749a03f63febbeb990",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/cloth/avatar1-helloweenmqo_\u8b5b\u6d69Normal.png",
+        "type": "kTexture"
+    },
+    "3784a951dbf03b645afc723f23aea29b": {
+        "guid": "3784a951dbf03b645afc723f23aea29b",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/roundedCubeAlbedo.png",
+        "type": "kTexture"
+    },
+    "3d7739f293019494fb8995a1fc38422c": {
+        "guid": "3d7739f293019494fb8995a1fc38422c",
+        "path": "Assets/arktoon Shaders/Shaders/EmissiveFreakFade.shader",
+        "type": "kShader"
+    },
+    "41f08346347915f4ab25c430bc631734": {
+        "guid": "41f08346347915f4ab25c430bc631734",
+        "path": "Assets/arktoon Shaders/Shaders/cginc/arkludeDecl.cginc",
+        "type": "kShader"
+    },
+    "4329612c3238cc44091f699ba05da324": {
+        "guid": "4329612c3238cc44091f699ba05da324",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/mannequin/mannequin1.mat",
+        "type": "kMaterial"
+    },
+    "4503b37ba19b4734882700173d3f95a1": {
+        "guid": "4503b37ba19b4734882700173d3f95a1",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials",
+        "type": "kDir"
+    },
+    "47c95c2343f176e47b666b929de8f68c": {
+        "guid": "47c95c2343f176e47b666b929de8f68c",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/MaskExample.jpg",
+        "type": "kTexture"
+    },
+    "4867c15b078ab3948ab5a758a9bcb047": {
+        "guid": "4867c15b078ab3948ab5a758a9bcb047",
+        "path": "Assets/arktoon Shaders/Shaders/StencilReader.shader",
+        "type": "kShader"
+    },
+    "4d1297e8a783e3242a35e699af99982c": {
+        "guid": "4d1297e8a783e3242a35e699af99982c",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/EmissiveFreak/grdient_left.png",
+        "type": "kTexture"
+    },
+    "4d5d0929a993a6543b9de355f69555d6": {
+        "guid": "4d5d0929a993a6543b9de355f69555d6",
+        "path": "Assets/arktoon Shaders/Editor/ArktoonManager.cs",
+        "type": "kUnknown"
+    },
+    "4e89ae95769497940b832301e2796fe7": {
+        "guid": "4e89ae95769497940b832301e2796fe7",
+        "path": "Assets/arktoon Shaders/Examples/ExampleScene/Lightmap-0_comp_light.exr",
+        "type": "kUnknown"
+    },
+    "5034690b290c8b74cb03497a06726ad3": {
+        "guid": "5034690b290c8b74cb03497a06726ad3",
+        "path": "Assets/arktoon Shaders/Editor/ArktoonMigrator.cs",
+        "type": "kUnknown"
+    },
+    "51d178f628b7f114c89afd04967fef93": {
+        "guid": "51d178f628b7f114c89afd04967fef93",
+        "path": "Assets/arktoon Shaders/Examples/Objects/rotate.anim",
+        "type": "kUnknown"
+    },
+    "5442a72b60d051246a76c8f21271b526": {
+        "guid": "5442a72b60d051246a76c8f21271b526",
+        "path": "Assets/arktoon Shaders/Shaders",
+        "type": "kDir"
+    },
+    "57338689439fb4a4fa1a42ebf3816059": {
+        "guid": "57338689439fb4a4fa1a42ebf3816059",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/material 8.mat",
+        "type": "kMaterial"
+    },
+    "59d5a749db7a82345ac3c4860b27c186": {
+        "guid": "59d5a749db7a82345ac3c4860b27c186",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/mannequin",
+        "type": "kDir"
+    },
+    "5cdca66777e3963468a57b44e76b86c4": {
+        "guid": "5cdca66777e3963468a57b44e76b86c4",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/mannequin/mannequin2.mat",
+        "type": "kMaterial"
+    },
+    "5d87d8e428ab7dc43b51a4ace5e8f55c": {
+        "guid": "5d87d8e428ab7dc43b51a4ace5e8f55c",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/EmissiveFreak/grdient_horizontal.png",
+        "type": "kTexture"
+    },
+    "5ebfcc9cd374c614dba1f903f8de36ba": {
+        "guid": "5ebfcc9cd374c614dba1f903f8de36ba",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/cloth/Cloth.mat",
+        "type": "kMaterial"
+    },
+    "5fa80aa54e3d3d64d808f8989e2e7d68": {
+        "guid": "5fa80aa54e3d3d64d808f8989e2e7d68",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/roundedCubeNormal.png",
+        "type": "kTexture"
+    },
+    "5fd6b70947bef774b882d05c744c3281": {
+        "guid": "5fd6b70947bef774b882d05c744c3281",
+        "path": "Assets/arktoon Shaders/Shaders/cginc/arkludeOther.cginc",
+        "type": "kShader"
+    },
+    "6182e5d390ecba149a1f8d75312e956e": {
+        "guid": "6182e5d390ecba149a1f8d75312e956e",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/EmissiveFreak/EmissiveFreakMaterial.mat",
+        "type": "kMaterial"
+    },
+    "62d584da6ad09fc409aba9a6ea4c76ad": {
+        "guid": "62d584da6ad09fc409aba9a6ea4c76ad",
+        "path": "Assets/arktoon Shaders/Shaders/StencilWriter.shader",
+        "type": "kShader"
+    },
+    "63000287678da044197a3ff745d75c25": {
+        "guid": "63000287678da044197a3ff745d75c25",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/mannequin-knit/mannequin-knit.mat",
+        "type": "kMaterial"
+    },
+    "6a1bea8b3245cd44a879612d2d6f40d6": {
+        "guid": "6a1bea8b3245cd44a879612d2d6f40d6",
+        "path": "Assets/arktoon Shaders/LICENSE",
+        "type": "kDir"
+    },
+    "6e08acecbe384864d82690f1704a89bf": {
+        "guid": "6e08acecbe384864d82690f1704a89bf",
+        "path": "Assets/arktoon Shaders/Shaders/EmissiveFreakOpaque.shader",
+        "type": "kShader"
+    },
+    "753d0fc07395b8d499b66e6e00b64079": {
+        "guid": "753d0fc07395b8d499b66e6e00b64079",
+        "path": "Assets/arktoon Shaders/Shaders/StencilReaderFade.shader",
+        "type": "kShader"
+    },
+    "7570c67b3d1666f40bd3fdc1605ac116": {
+        "guid": "7570c67b3d1666f40bd3fdc1605ac116",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/EmissiveFreak/grdient_vertical.png",
+        "type": "kTexture"
+    },
+    "759699a6a69f60d4ba9d3e4b9d056a53": {
+        "guid": "759699a6a69f60d4ba9d3e4b9d056a53",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/cloth",
+        "type": "kDir"
+    },
+    "7882bcb890208a14bb86157b6ff1a481": {
+        "guid": "7882bcb890208a14bb86157b6ff1a481",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/Cubemap.png",
+        "type": "kTexture"
+    },
+    "78fe4775dab382743bff58498ce90874": {
+        "guid": "78fe4775dab382743bff58498ce90874",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/EmissiveFreak",
+        "type": "kDir"
+    },
+    "7bd75a18577b92e40b20efe0ae74859a": {
+        "guid": "7bd75a18577b92e40b20efe0ae74859a",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/mannequin-painted-stl/mannequin_hada_Normal.png",
+        "type": "kTexture"
+    },
+    "7d4ac9335e1cc82488a383bd849a380c": {
+        "guid": "7d4ac9335e1cc82488a383bd849a380c",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/material 12.mat",
+        "type": "kMaterial"
+    },
+    "7f8da376b282b48428e6012d1d6b01e4": {
+        "guid": "7f8da376b282b48428e6012d1d6b01e4",
+        "path": "Assets/arktoon Shaders/Examples/Objects/mannequin.controller",
+        "type": "kUnknown"
+    },
+    "843df9acfbb8ceb4db473c9f090be43a": {
+        "guid": "843df9acfbb8ceb4db473c9f090be43a",
+        "path": "Assets/arktoon Shaders/Editor",
+        "type": "kDir"
+    },
+    "86c25d309b5f3114ab3f949d7655aea3": {
+        "guid": "86c25d309b5f3114ab3f949d7655aea3",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/material 9.mat",
+        "type": "kMaterial"
+    },
+    "875f4a9e268dfff44981f8902e14c44c": {
+        "guid": "875f4a9e268dfff44981f8902e14c44c",
+        "path": "Assets/arktoon Shaders/Shaders/cginc/arkludeVertGeom.cginc",
+        "type": "kShader"
+    },
+    "88728f426bf72d74b9abd9ceb8ecbd2c": {
+        "guid": "88728f426bf72d74b9abd9ceb8ecbd2c",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/material 1.mat",
+        "type": "kMaterial"
+    },
+    "9566a373fffe627408d31026ce69389d": {
+        "guid": "9566a373fffe627408d31026ce69389d",
+        "path": "Assets/arktoon Shaders/Shaders/Opaque.shader",
+        "type": "kShader"
+    },
+    "97f31596e13b1db489cc69f4f2cbcc9e": {
+        "guid": "97f31596e13b1db489cc69f4f2cbcc9e",
+        "path": "Assets/arktoon Shaders/Shaders/cginc/arkludeFragOnlyStencilWrite.cginc",
+        "type": "kShader"
+    },
+    "a2d8565e76f62d14e9c149040f122c19": {
+        "guid": "a2d8565e76f62d14e9c149040f122c19",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/material.mat",
+        "type": "kMaterial"
+    },
+    "a3ef914d408315f4a866313ae9b15162": {
+        "guid": "a3ef914d408315f4a866313ae9b15162",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/Matcap3.png",
+        "type": "kTexture"
+    },
+    "abc253a50f12dc0478eb8c149b35af54": {
+        "guid": "abc253a50f12dc0478eb8c149b35af54",
+        "path": "Assets/arktoon Shaders/Shaders/StencilWriterMaskTexture.shader",
+        "type": "kShader"
+    },
+    "af4dae3c66f957c45a9fb9d57f26dcad": {
+        "guid": "af4dae3c66f957c45a9fb9d57f26dcad",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/FadeTextureExample.png",
+        "type": "kTexture"
+    },
+    "b1fd4b404a3a7ae4e99356a0c300f34b": {
+        "guid": "b1fd4b404a3a7ae4e99356a0c300f34b",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/cloth/avatar1-helloweenmqo_\u8b5b\u6d69MetallicSmoothness.png",
+        "type": "kTexture"
+    },
+    "b407561bc3f21de4c8808646f3a719ca": {
+        "guid": "b407561bc3f21de4c8808646f3a719ca",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/Walls.mat",
+        "type": "kMaterial"
+    },
+    "b740ced5626064a469a29ecbad7cde4f": {
+        "guid": "b740ced5626064a469a29ecbad7cde4f",
+        "path": "Assets/arktoon Shaders/Examples/Objects/HalfSphere.mqo",
+        "type": "kUnknown"
+    },
+    "b7f00477d8c2131439bc5469d268da66": {
+        "guid": "b7f00477d8c2131439bc5469d268da66",
+        "path": "Assets/arktoon Shaders/Shaders/cginc/arkludeFrag.cginc",
+        "type": "kShader"
+    },
+    "b926be28e701612428d98637dc2bf8a7": {
+        "guid": "b926be28e701612428d98637dc2bf8a7",
+        "path": "Assets/arktoon Shaders/Examples/ExampleScene/LightingData.asset",
+        "type": "kUnknown"
+    },
+    "ba3d17439ff630146b1b2965b680eae4": {
+        "guid": "ba3d17439ff630146b1b2965b680eae4",
+        "path": "Assets/arktoon Shaders/Examples",
+        "type": "kDir"
+    },
+    "baa8c39629448f14f9f7dd8c1428dbe1": {
+        "guid": "baa8c39629448f14f9f7dd8c1428dbe1",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/mannequin-painted-stl/mannequin_hada_AlbedoTransparency.png",
+        "type": "kTexture"
+    },
+    "bdae57075e6f4c54eae3846b56575a55": {
+        "guid": "bdae57075e6f4c54eae3846b56575a55",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/mannequin-painted-stl",
+        "type": "kDir"
+    },
+    "c2c262af144c1b042adc2954103f4e22": {
+        "guid": "c2c262af144c1b042adc2954103f4e22",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/mannequin-painted-stl/mannequin-green-metal.mat",
+        "type": "kMaterial"
+    },
+    "c3830c5b3aa068745afa82287a25ceb8": {
+        "guid": "c3830c5b3aa068745afa82287a25ceb8",
+        "path": "Assets/arktoon Shaders/Shaders/cginc/arkludeFadeShadowCaster.cginc",
+        "type": "kShader"
+    },
+    "c7e141183bc6c5c40a37d02d5dc415e6": {
+        "guid": "c7e141183bc6c5c40a37d02d5dc415e6",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/starfield.png",
+        "type": "kTexture"
+    },
+    "ca4a46b6454383540b9b0b4364a2d7ee": {
+        "guid": "ca4a46b6454383540b9b0b4364a2d7ee",
+        "path": "Assets/arktoon Shaders/Shaders/FadeRefracted.shader",
+        "type": "kShader"
+    },
+    "d243a1118bcad54469f0c17ced97f1a0": {
+        "guid": "d243a1118bcad54469f0c17ced97f1a0",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/mannequin-painted-stl/mannequin_hada_MetallicSmoothness.png",
+        "type": "kTexture"
+    },
+    "d34ddb690407bf04c8c9788205512415": {
+        "guid": "d34ddb690407bf04c8c9788205512415",
+        "path": "Assets/arktoon Shaders/Shaders/Cutout.shader",
+        "type": "kShader"
+    },
+    "d38a3e7d20b34a2408ba6a324f104187": {
+        "guid": "d38a3e7d20b34a2408ba6a324f104187",
+        "path": "Assets/arktoon Shaders/Shaders/cginc",
+        "type": "kDir"
+    },
+    "d3b441a2eeaf2a54ca981ff0de83ef8a": {
+        "guid": "d3b441a2eeaf2a54ca981ff0de83ef8a",
+        "path": "Assets/arktoon Shaders",
+        "type": "kDir"
+    },
+    "d4952f2db95a16447a3fc2bb0d342c9d": {
+        "guid": "d4952f2db95a16447a3fc2bb0d342c9d",
+        "path": "Assets/arktoon Shaders/Examples/Objects/roundedCube.fbx",
+        "type": "kUnknown"
+    },
+    "d6390657f902d1142a20b5cc7f92ffe2": {
+        "guid": "d6390657f902d1142a20b5cc7f92ffe2",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/material 3.mat",
+        "type": "kMaterial"
+    },
+    "d96088e780c661443a32b60fa5a2b7aa": {
+        "guid": "d96088e780c661443a32b60fa5a2b7aa",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/Matcap2.jpg",
+        "type": "kTexture"
+    },
+    "dbb03b5985b46d24ba69d49af4f706e5": {
+        "guid": "dbb03b5985b46d24ba69d49af4f706e5",
+        "path": "Assets/arktoon Shaders/Examples/ExampleScene",
+        "type": "kDir"
+    },
+    "e117484d237f25a4f9c117444d3a4ae0": {
+        "guid": "e117484d237f25a4f9c117444d3a4ae0",
+        "path": "Assets/arktoon Shaders/Shaders/cginc/arkludeAdd.cginc",
+        "type": "kShader"
+    },
+    "e71575e4ccb008d4e883335c3ad49265": {
+        "guid": "e71575e4ccb008d4e883335c3ad49265",
+        "path": "Assets/arktoon Shaders/Shaders/EmissiveFreakStencilReader.shader",
+        "type": "kShader"
+    },
+    "e9bfebf98ae9cae45b922038482fc4da": {
+        "guid": "e9bfebf98ae9cae45b922038482fc4da",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/mannequin-painted-stl/mannequin-steel.mat",
+        "type": "kMaterial"
+    },
+    "eb0465484fd24bd458c85ad5c6554747": {
+        "guid": "eb0465484fd24bd458c85ad5c6554747",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/material 2.mat",
+        "type": "kMaterial"
+    },
+    "f1d089ea7b8a9194daa229671bd7487e": {
+        "guid": "f1d089ea7b8a9194daa229671bd7487e",
+        "path": "Assets/arktoon Shaders/Examples/Objects/HalfSphere.fbx",
+        "type": "kUnknown"
+    },
+    "f2b7b269124aad04f8ed1394bb7a104b": {
+        "guid": "f2b7b269124aad04f8ed1394bb7a104b",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/mannequin-knit/mannequin_hada_AlbedoTransparency.png",
+        "type": "kTexture"
+    },
+    "f336693355a393a4ea5a94d414b523c1": {
+        "guid": "f336693355a393a4ea5a94d414b523c1",
+        "path": "Assets/arktoon Shaders/Examples/ExampleScene.unity",
+        "type": "kUnknown"
+    },
+    "f651c02bf9fdac1408c87c0e4f6cdd2b": {
+        "guid": "f651c02bf9fdac1408c87c0e4f6cdd2b",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/material 6.mat",
+        "type": "kMaterial"
+    },
+    "f93b9ae325c77ef4ead760d39eca7b5f": {
+        "guid": "f93b9ae325c77ef4ead760d39eca7b5f",
+        "path": "Assets/arktoon Shaders/Examples/Objects/Materials/cloth/avatar1-helloweenmqo_\u8b5b\u6d69AlbedoTransparency.png",
+        "type": "kTexture"
+    },
+    "fd5c20ab9c5485444b5084f464d91504": {
+        "guid": "fd5c20ab9c5485444b5084f464d91504",
+        "path": "Assets/arktoon Shaders/Shaders/Fade.shader",
+        "type": "kShader"
+    },
+    "ff81093a7ac88134798d4274c55cc425": {
+        "guid": "ff81093a7ac88134798d4274c55cc425",
+        "path": "Assets/arktoon Shaders/Shaders/EmissiveFreakFadeRefracted.shader",
+        "type": "kShader"
+    }
+}

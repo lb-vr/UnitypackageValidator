@@ -28,7 +28,7 @@ if __name__ == "__main__":
     parser.add_argument('-q', '--quiet', help=tr('mute stdout flag.'), action='store_true')
     parser.add_argument('-rd', '--redirect', help=tr('redirect output json string to stdout.'), action='store_true')
     parser.add_argument('-l', '--log-level', help=tr('select log level of stderr. default is "error"'), choices=['debug', 'info', 'warn', 'error'], default='error')
-    parser.add_argument('-pk', '--packages', help=tr('common asset unitypackages. only for ruletool.'), nargs='*', default=[])
+    parser.add_argument('-pk', '--packages', help=tr('common asset unitypackages.'), nargs='*', default=[])
     parser.add_argument('-a', '--author', help=tr('author name'), type=str, default=getpass.getuser())
     args = parser.parse_args()
 
@@ -46,11 +46,9 @@ if __name__ == "__main__":
     # open ui or validating
     if args.batch:
         if args.mode == 'validator':
-            v = validator.Validator()
-            v.do()
+            validator.batch_main(args)
         else:
             rule.batch_main(args)
-
     else:
         # open ui but not implemented yet.
         raise RuntimeWarning('UI has not been implemented yet.')
