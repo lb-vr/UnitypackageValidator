@@ -1,8 +1,11 @@
+import tempfile
+import tarfile
+import logging
 import os
 import enum
 import re
 
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 
 class AssetType(enum.Enum):
@@ -34,7 +37,7 @@ class Asset:
         self.__guid: str = ''
         self.__reference_guids: Dict[str, Any] = {}
 
-    def load(self, dir: str) -> str:
+    def load(self, dir: str, load_references: bool = True) -> str:
         """
         unitypackageからアセットの情報を取得します。
         unitypackageを解凍した後、guidで区切られたアセットフォルダに対して解析を行います。
@@ -44,23 +47,28 @@ class Asset:
         self.__type = AssetType.getFromFilename(self.__path)
         self.__guid = os.path.basename(dir)
 
-        list1 = Asset.__getGuid(os.path.join(dir, 'asset.meta'))
-        list2 = Asset.__getGuid(os.path.join(dir, 'asset'))
-        list1.update(list2)
-        list1.pop(self.__guid)
-        self.__reference_guids = list1
+        if load_references:
+            list1 = Asset.__getGuid(os.path.join(dir, 'asset.meta'))
+            list2 = Asset.__getGuid(os.path.join(dir, 'asset'))
+            list1.update(list2)
+            list1.pop(self.__guid)
+            self.__reference_guids = list1
         return self.__guid
 
     @property
-    def path(self) -> str: return self.__path
+    def path(self) -> str:
+        return self.__path
 
     @property
-    def assetType(self) -> AssetType: return self.__type
+    def assetType(self) -> AssetType:
+        return self.__type
 
     @property
-    def guid(self) -> str: return self.__guid
+    def guid(self) -> str:
+        return self.__guid
 
-    def getReference(self) -> Dict[str, Any]: return self.__reference_guids
+    def getReference(self) -> Dict[str, Any]:
+        return self.__reference_guids
 
     def toDict(self, reference_info_include: bool = True) -> Dict[str, Any]:
         ret: Dict[str, Any] = {
@@ -93,3 +101,42 @@ class Asset:
         except FileNotFoundError:
             pass
         return matched
+
+
+class Unitypackage:
+    __logger = logging.getLogger('Unitypackage')
+
+    def __init__(self, package_filename: str, assets: List[Asset] = []):
+        self.__package_filename: str = package_filename
+        self.__assets: List[Asset] = assets
+        self.__logger = Unitypackage.__logger
+
+    @property
+    def filename(self) -> str:
+        return self.__package_filename
+
+    @property
+    def assets(self) -> List[Asset]:
+        return self.__assets
+
+    def loadFromUnitypackage(self):
+        self.__logger.info('Start to load %s package.', self.__package_filename)
+        cwd = os.getcwd()
+        with tempfile.TemporaryDirectory() as tmpdir:
+            os.chdir(tmpdir)
+            self.__logger.debug(' - Working dir = %s', tmpdir)
+            # open tar
+            with tarfile.open(self.__package_filename, 'r:gz') as tar:
+                self.__logger.debug(' - %d file(s) are included.', len(tar.getnames()))
+
+                # extract tar
+                tar.extractall()
+                folders = os.listdir()
+                self.__logger.debug(' - Extracted.')
+
+                for f in folders:
+                    asset = Asset()
+                    asset.load(f, False)
+                    self.__assets.append(asset)
+
+            os.chdir(cwd)

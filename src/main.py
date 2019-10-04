@@ -13,7 +13,7 @@ from .rule import rule
 def main():
     # parse arguments
     parser = argparse.ArgumentParser(description='Unitypackage validator.')
-    parser.add_argument('-m', '--mode', help='switch mode.', choices=['validator', 'ruletool'], default='validator')
+    parser.add_argument('-m', '--mode', help='switch mode.', choices=['validator', 'makerule'], default='validator')
     parser.add_argument('-b', '--batch', help='work on batch mode.', action='store_true')
     parser.add_argument('-q', '--quiet', help='mute stdout flag.', action='store_true')
     parser.add_argument('-i', '--import-packages', help='common asset unitypackage(s).', nargs='*', default=[])

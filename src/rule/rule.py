@@ -1,10 +1,10 @@
 import os
-import tempfile
 from datetime import datetime
-from typing import List, Dict, Any
-import tarfile
+from typing import Dict
 import logging
 import json
+
+from ..common.data import Asset, Unitypackage
 
 
 class Rule:
@@ -12,42 +12,43 @@ class Rule:
 
     def __init__(self):
         self.author: str = 'No name'
-        self.packages_fpath: List[str] = []
+        self.__whitelist: Dict[str, Asset] = {}
+        self.__blacklist: Dict[str, Asset] = {}
 
-    def createRule(self, dst: str) -> bool:
+    def addWhitelistReference(self, asset: Asset):
+        self.__whitelist[asset.guid] = asset
+
+    def addBlacklistIncluded(self, asset: Asset):
+        self.__blacklist[asset.guid] = asset
+
+    def addWhitelistReferenceFromUnitypackage(self, unitypackage: Unitypackage):
+        for asset in unitypackage.assets:
+            self.addWhitelistReference(asset)
+
+    def addBlacklistIncludedFromUnitypackage(self, unitypackage: Unitypackage):
+        for asset in unitypackage.assets:
+            self.addBlacklistIncluded(asset)
+
+    def dumpToJson(self, dst: str) -> bool:
         if not dst:
             Rule.__logger.fatal('Output filepath is empty.')
             return False
 
-        jdict: Dict[str, Any] = {
-            'created': {
-                'time': datetime.now().strftime('%Y/%m/%d %H:%M:%S'),
-                'author': self.author
+        jdict: dict = {
+            'header': {
+                'author': self.author,
+                'datetime': datetime.now().strftime('%Y/%m/%d %H:%M:%S'),
             },
-            'common_packages': []
+            'whitelist_reference': {},
+            'blacklist_included': {}
         }
 
-        cwd = os.getcwd()
-        for fpath in self.packages_fpath:
-            Rule.__logger.debug('Package = %s', fpath)
-            upack: Dict[str, Any] = {'name': os.path.basename(fpath), 'assets': []}
-            with tempfile.TemporaryDirectory() as tmpdir:
-                os.chdir(tmpdir)
-                Rule.__logger.debug(' - Working dir = %s', tmpdir)
-                # open tar
-                with tarfile.open(fpath, 'r:gz') as tar:
-                    Rule.__logger.debug(' - %d file(s) are included.', len(tar.getnames()))
+        for wasset in self.__whitelist.values():
+            jdict['whitelist_reference'][wasset.guid] = wasset.toDict(False)
 
-                    # extract tar
-                    tar.extractall()
-                    folders = os.listdir()
-                    for f in folders:
-                        path = ''
-                        with open(os.path.join(f, 'pathname')) as fp:
-                            path = fp.read()
-                        upack['assets'].append({'guid': f, 'path': path})
-                os.chdir(cwd)
-            jdict['common_packages'].append(upack)
+        for basset in self.__blacklist.values():
+            jdict['whitelist_reference'][basset.guid] = basset.toDict(False)
+
         with open(os.path.join(os.getcwd(), dst), mode='w', encoding='utf-8') as fjson:
             json.dump(jdict, fjson, indent=4)
         return True
@@ -56,5 +57,9 @@ class Rule:
 def batch_main(args):
     rule = Rule()
     rule.author = args.author
-    rule.packages_fpath = map(lambda x: os.path.join(os.getcwd(), x), args.packages)
-    rule.createRule(args.output)
+    for upack in args.import_packages:
+        unitypackage = Unitypackage(package_filename=os.path.join(os.getcwd(), upack))
+        unitypackage.loadFromUnitypackage()
+        # TODO 今はテストで全部ホワイトリストに突っ込んでる
+        rule.addWhitelistReferenceFromUnitypackage(unitypackage)
+    rule.dumpToJson(args.output)
