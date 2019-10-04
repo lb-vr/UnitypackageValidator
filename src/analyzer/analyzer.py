@@ -1,18 +1,25 @@
-import re
-from typing import Dict, List, Any
-import logging
+# (c) 2019 lb-vr (WhiteAtelier)
 import os
-import tempfile
-import tarfile
+
 import enum
 import json
+import logging
+import re
+import tarfile
+import tempfile
 
-from rule.rule import Rule
+from typing import Dict, List, Any
+
+from ..rule.rule import Rule
+
+##
+# @brief AssetType
 
 
 class AssetType(enum.Enum):
-    kTexture = ('png', 'jpg', 'jpeg', 'bmp', 'hdr', 'tif')
-    kScene = ('scene',)
+    kTexture = ('png', 'jpg', 'jpeg', 'bmp')
+    kHdrTexture = ('exr', 'hdr', 'tif', 'tiff')
+    kScene = ('unity',)
     kShader = ('shader', 'cginc')
     kMaterial = ('mat',)
     kDir = ('',)
@@ -33,7 +40,7 @@ class Asset:
         self.__path: str = ''
         self.__type: AssetType = AssetType.kUnknown
         self.__guid: str = ''
-        self.__require_guids: Dict[str, Any] = {}
+        self.__reference_guids: Dict[str, Any] = {}
 
     def load(self, dir: str) -> str:
         with open(os.path.join(dir, 'pathname')) as fp:
@@ -60,16 +67,16 @@ class Asset:
     def getRequire(self) -> Dict[str, Any]: return self.__require_guids
 
     def toDict(self) -> dict:
-        ret = {
+        require_dict: Dict[str, Any]
+        for k, v in self.__require_guids.items():
+            if v:
+                (ret['require'])[k] = v.toDict()
+        return {
             'guid': self.guid,
             'path': self.path,
             'type': self.assetType.name,
             'require': {}
         }
-        for k, v in self.__require_guids.items():
-            if v:
-                (ret['require'])[k] = v.toDict()
-        return ret
 
     @classmethod
     def __getGuid(self, filepath: str) -> Dict[str, None]:
@@ -144,7 +151,7 @@ class Validator:
 
 
 def batch_main(args):
-    for pkg in args.packages:
+    for pkg in args.import_packages:
         vd = Validator()
         vd.loadUnitypackage(os.path.join(os.getcwd(), pkg))
         vd.validateReference(None)

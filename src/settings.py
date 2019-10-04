@@ -2,7 +2,8 @@ import os
 import logging
 import toml
 
-from util.json_util import fetchValue as _fetch
+
+from .util.json_util import fetchValue as _fetch
 
 
 class GlobalSettings:
