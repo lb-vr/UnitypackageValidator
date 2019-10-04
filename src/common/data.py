@@ -15,6 +15,9 @@ class AssetType(enum.Enum):
     kScene = ('unity',)
     kShader = ('shader', 'cginc')
     kMaterial = ('mat',)
+    kModel = ('fbx', 'obj')
+    kAnimation = ('anim', 'controller')
+    kPrefab = ('prefab',)
     kDir = ('',)
     kUnknown = ('*',)
 
