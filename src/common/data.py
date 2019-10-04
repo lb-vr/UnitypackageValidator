@@ -1,3 +1,4 @@
+import json
 import tempfile
 import tarfile
 import logging
@@ -67,7 +68,8 @@ class Asset:
     def guid(self) -> str:
         return self.__guid
 
-    def getReference(self) -> Dict[str, Any]:
+    @property
+    def references(self) -> Dict[str, Any]:
         return self.__reference_guids
 
     def toDict(self, reference_info_include: bool = True) -> Dict[str, Any]:
@@ -108,7 +110,9 @@ class Unitypackage:
 
     def __init__(self, package_filename: str, assets: List[Asset] = []):
         self.__package_filename: str = package_filename
-        self.__assets: List[Asset] = assets
+        self.__assets: Dict[str, Asset] = {}
+        for asset in assets:
+            self.__assets[asset.guid] = asset
         self.__logger = Unitypackage.__logger
 
     @property
@@ -116,27 +120,58 @@ class Unitypackage:
         return self.__package_filename
 
     @property
-    def assets(self) -> List[Asset]:
+    def assets(self) -> Dict[str, Asset]:
         return self.__assets
 
-    def loadFromUnitypackage(self):
+    def loadFromUnitypackage(self) -> bool:
+        ret = True
         self.__logger.info('Start to load %s package.', self.__package_filename)
         cwd = os.getcwd()
         with tempfile.TemporaryDirectory() as tmpdir:
             os.chdir(tmpdir)
             self.__logger.debug(' - Working dir = %s', tmpdir)
             # open tar
-            with tarfile.open(self.__package_filename, 'r:gz') as tar:
-                self.__logger.debug(' - %d file(s) are included.', len(tar.getnames()))
+            try:
+                with tarfile.open(self.__package_filename, 'r:gz') as tar:
+                    self.__logger.debug(' - %d file(s) are included.', len(tar.getnames()))
 
-                # extract tar
-                tar.extractall()
-                folders = os.listdir()
-                self.__logger.debug(' - Extracted.')
+                    # extract tar
+                    tar.extractall()
+                    folders = os.listdir()
+                    self.__logger.debug(' - Extracted.')
 
-                for f in folders:
-                    asset = Asset()
-                    asset.load(f, False)
-                    self.__assets.append(asset)
+                    for f in folders:
+                        asset = Asset()
+                        asset.load(f)
+                        self.__assets[asset.guid] = asset
 
-            os.chdir(cwd)
+            except FileNotFoundError:
+                self.__logger.error(' - Unitypackage is not found. PATH = "%s"', self.__package_filename)
+                ret = False
+            finally:
+                os.chdir(cwd)
+        return ret
+
+    def linkReferences(self, whitelist: Dict[str, Asset] = {}):
+        for asset in self.__assets.values():
+            # asset loop
+            references = asset.references
+            for ref_guid in references.keys():
+                # reference loop
+                if ref_guid in self.__assets:
+                    self.__logger.debug('Find Referenced Asset! %s', ref_guid)
+                    # self.__assets[asset.guid].references[ref_guid] = self.__assets[ref_guid]  # linking
+                    asset.references[ref_guid] = self.__assets[ref_guid]
+                elif ref_guid in whitelist:
+                    asset.references[ref_guid] = whitelist[ref_guid]  # linking to whitelist
+
+    def toDict(self) -> dict:
+        assets = {}
+        for asset in self.__assets.values():
+            assets[asset.guid] = asset.toDict()
+
+        ret = {
+            'filename': self.__package_filename,
+            'assets': assets
+        }
+        return ret

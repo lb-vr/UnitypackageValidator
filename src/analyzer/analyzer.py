@@ -3,13 +3,11 @@ import os
 
 import json
 import logging
-import tarfile
-import tempfile
 
-from typing import Dict, List
+from typing import List
 
 from ..rule.rule import Rule
-from ..common.data import Asset, AssetType
+from ..common.data import Asset, AssetType, Unitypackage
 
 
 class AssetReferenceError:
@@ -21,35 +19,18 @@ class AssetReferenceError:
 class Analyzer:
     __logger = logging.getLogger('Analyzer')
 
-    def __init__(self):
-        self.__assets: Dict[str, Asset] = {}
+    def __init__(self, unitypackage: Unitypackage):
+        self.__unitypackage: Unitypackage = unitypackage
         self.__logger = Analyzer.__logger
-
-    def loadUnitypackage(self, upkg: str):
-        cwd = os.getcwd()
-        self.__logger.debug('Start to validate. Package = %s', upkg)
-        with tempfile.TemporaryDirectory() as tmpdir:
-            os.chdir(tmpdir)
-            self.__logger.debug(' - Working dir = %s', tmpdir)
-            # open tar
-            with tarfile.open(upkg, 'r:gz') as tar:
-                self.__logger.debug(' - %d file(s) are included.', len(tar.getnames()))
-                tar.extractall()
-                folders = os.listdir()
-                for f in folders:
-                    asset = Asset()
-                    guid = asset.load(f)
-                    self.__assets[guid] = asset
-            os.chdir(cwd)
 
     def analyzeReference(self, rule: Rule) -> List[AssetReferenceError]:
         ret: List[AssetReferenceError] = []
 
-        for val in self.__assets.values():
+        for val in self.__unitypackage.assets:
             guids = list(val.getReference().keys())
             for k in guids:
-                if k in self.__assets.keys():
-                    val.getReference()[k] = self.__assets[k]
+                if k in self.__unitypackage.assets.keys():
+                    val.getReference()[k] = self.__unitypackage.assets[k]
                     continue
                 # elif rule.searchGuid(req):
                 #    continue
@@ -60,8 +41,8 @@ class Analyzer:
 
     def dumpToJson(self, dst: str):
         ret = {}
-        for k, v in self.__assets.items():
-            ret[k] = v.toDict()
+        for asset in self.__unitypackage.assets:
+            ret[asset.guid] = asset.toDict()
 
         with open(os.path.join(os.getcwd(), dst), mode='w', encoding='utf-8') as fjson:
             json.dump(ret, fjson, indent=4)
@@ -69,7 +50,12 @@ class Analyzer:
 
 def batch_main(args):
     for pkg in args.import_packages:
-        analyzer = Analyzer()
-        analyzer.loadUnitypackage(os.path.join(os.getcwd(), pkg))
-        ret = analyzer.analyzeReference(None)
-        analyzer.dumpToJson(os.path.join(os.getcwd(), os.path.basename(pkg) + '-' + args.output))
+        unitypackage = Unitypackage(os.path.join(os.getcwd(), pkg))
+        if not unitypackage.loadFromUnitypackage():
+            exit(-1)
+
+        unitypackage.linkReferences({})
+
+    ret = unitypackage.toDict()
+    with open(os.path.join(os.getcwd(), args.output), mode='w', encoding='utf-8') as fjson:
+        json.dump(ret, fjson, indent=4)

@@ -22,11 +22,11 @@ class Rule:
         self.__blacklist[asset.guid] = asset
 
     def addWhitelistReferenceFromUnitypackage(self, unitypackage: Unitypackage):
-        for asset in unitypackage.assets:
+        for asset in unitypackage.assets.values():
             self.addWhitelistReference(asset)
 
     def addBlacklistIncludedFromUnitypackage(self, unitypackage: Unitypackage):
-        for asset in unitypackage.assets:
+        for asset in unitypackage.assets.values():
             self.addBlacklistIncluded(asset)
 
     def dumpToJson(self, dst: str) -> bool:
