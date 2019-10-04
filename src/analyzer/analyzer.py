@@ -67,15 +67,15 @@ class Asset:
     def getRequire(self) -> Dict[str, Any]: return self.__require_guids
 
     def toDict(self) -> dict:
-        require_dict: Dict[str, Any]
+        require_dict: Dict[str, Any] = {}
         for k, v in self.__require_guids.items():
             if v:
-                (ret['require'])[k] = v.toDict()
+                require_dict[k] = v.toDict()
         return {
             'guid': self.guid,
             'path': self.path,
             'type': self.assetType.name,
-            'require': {}
+            'require': require_dict
         }
 
     @classmethod
