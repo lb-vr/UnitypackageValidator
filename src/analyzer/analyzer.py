@@ -12,9 +12,6 @@ from typing import Dict, List, Any
 
 from ..rule.rule import Rule
 
-##
-# @brief AssetType
-
 
 class AssetType(enum.Enum):
     kTexture = ('png', 'jpg', 'jpeg', 'bmp')
@@ -52,7 +49,7 @@ class Asset:
         list2 = Asset.__getGuid(os.path.join(dir, 'asset'))
         list1.update(list2)
         list1.pop(self.__guid)
-        self.__require_guids = list1
+        self.__reference_guids = list1
         return self.__guid
 
     @property
@@ -64,19 +61,23 @@ class Asset:
     @property
     def guid(self) -> str: return self.__guid
 
-    def getRequire(self) -> Dict[str, Any]: return self.__require_guids
+    def getReference(self) -> Dict[str, Any]: return self.__reference_guids
 
-    def toDict(self) -> dict:
-        require_dict: Dict[str, Any] = {}
-        for k, v in self.__require_guids.items():
-            if v:
-                require_dict[k] = v.toDict()
-        return {
+    def toDict(self, reference_info_include: bool = True) -> dict:
+        ret = {
             'guid': self.guid,
             'path': self.path,
-            'type': self.assetType.name,
-            'require': require_dict
+            'type': self.assetType.name
         }
+        if reference_info_include:
+            reference_dict: Dict[str, Any] = {}
+            for k, v in self.__reference_guids.items():
+                if v:
+                    reference_dict[k] = v.toDict(False)
+                else:
+                    reference_dict[k] = None
+            ret['references'] = reference_dict
+        return ret
 
     @classmethod
     def __getGuid(self, filepath: str) -> Dict[str, None]:
@@ -85,9 +86,9 @@ class Asset:
             fstr = ''
             with open(filepath, 'rt') as f:
                 fstr = f.read()
-            matched_list = re.findall(r'[\da-f]{32}', fstr)
+            matched_list = re.findall(r'guid: [0-9a-f]{32}', fstr)
             for m in matched_list:
-                matched[m] = None
+                matched[m[6:]] = None
         except UnicodeDecodeError:
             pass
         except FileNotFoundError:
@@ -101,12 +102,12 @@ class AssetReferenceError:
         self.__missing: str = missing
 
 
-class Validator:
-    __logger = logging.getLogger('Validator')
+class Analyzer:
+    __logger = logging.getLogger('Analyzer')
 
     def __init__(self):
         self.__assets: Dict[str, Asset] = {}
-        self.__logger = Validator.__logger
+        self.__logger = Analyzer.__logger
 
     def loadUnitypackage(self, upkg: str):
         cwd = os.getcwd()
@@ -125,20 +126,20 @@ class Validator:
                     self.__assets[guid] = asset
             os.chdir(cwd)
 
-    def validateReference(self, rule: Rule) -> List[AssetReferenceError]:
+    def analyzeReference(self, rule: Rule) -> List[AssetReferenceError]:
         ret: List[AssetReferenceError] = []
 
         for val in self.__assets.values():
-            for k in val.getRequire().keys():
+            guids = list(val.getReference().keys())
+            for k in guids:
                 if k in self.__assets.keys():
-                    val.getRequire()[k] = self.__assets[k]
-
+                    val.getReference()[k] = self.__assets[k]
                     continue
                 # elif rule.searchGuid(req):
                 #    continue
                 else:
                     ret.append(AssetReferenceError(val, k))
-                    # self.__logger.warning('AssetReferenceError : %s -> %s', val.path, k)
+                    self.__logger.warning('AssetReferenceError : %s -> %s', val.path, k)
         return ret
 
     def dumpToJson(self, dst: str):
@@ -152,7 +153,7 @@ class Validator:
 
 def batch_main(args):
     for pkg in args.import_packages:
-        vd = Validator()
-        vd.loadUnitypackage(os.path.join(os.getcwd(), pkg))
-        vd.validateReference(None)
-        vd.dumpToJson(os.path.join(os.getcwd(), os.path.basename(pkg) + '-' + args.output))
+        analyzer = Analyzer()
+        analyzer.loadUnitypackage(os.path.join(os.getcwd(), pkg))
+        ret = analyzer.analyzeReference(None)
+        analyzer.dumpToJson(os.path.join(os.getcwd(), os.path.basename(pkg) + '-' + args.output))
