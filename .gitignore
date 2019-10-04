@@ -5,6 +5,7 @@ __pycache__/
 
 # test
 testfiles/
+common_packages/*.unitypackage
 
 # C extensions
 *.so
