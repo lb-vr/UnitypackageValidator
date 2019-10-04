@@ -1,3 +1,8 @@
+import os
+import enum
+import re
+
+from typing import Dict, Any
 
 
 class AssetType(enum.Enum):
@@ -57,8 +62,8 @@ class Asset:
 
     def getReference(self) -> Dict[str, Any]: return self.__reference_guids
 
-    def toDict(self, reference_info_include: bool = True) -> dict:
-        ret = {
+    def toDict(self, reference_info_include: bool = True) -> Dict[str, Any]:
+        ret: Dict[str, Any] = {
             'guid': self.guid,
             'path': self.path,
             'type': self.assetType.name

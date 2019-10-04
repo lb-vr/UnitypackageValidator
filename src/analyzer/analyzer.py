@@ -1,16 +1,15 @@
 # (c) 2019 lb-vr (WhiteAtelier)
 import os
 
-import enum
 import json
 import logging
-import re
 import tarfile
 import tempfile
 
-from typing import Dict, List, Any
+from typing import Dict, List
 
 from ..rule.rule import Rule
+from ..common.data import Asset, AssetType
 
 
 class AssetReferenceError:
