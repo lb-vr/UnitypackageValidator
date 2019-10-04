@@ -17,6 +17,8 @@ class AssetType(enum.Enum):
     kModel = ('fbx', 'obj')
     kAnimation = ('anim', 'controller')
     kPrefab = ('prefab',)
+    kScript = ('cs',)
+
     kDir = ('',)
     kUnknown = ('*',)
 
@@ -34,6 +36,8 @@ class AssetType(enum.Enum):
 
 
 class Asset:
+    __logger = logging.getLogger('Asset')
+
     def __init__(self):
         self.__path: str = ''
         self.__type: AssetType = AssetType.kUnknown
@@ -54,7 +58,11 @@ class Asset:
             list1 = Asset.__getGuid(os.path.join(dir, 'asset.meta'))
             list2 = Asset.__getGuid(os.path.join(dir, 'asset'))
             list1.update(list2)
-            list1.pop(self.__guid)
+            if self.__guid in list1:
+                list1.pop(self.__guid)
+            else:
+                Asset.__logger.warning('there is no own guid in asset.meta. guid = %s, path = %s',
+                                       self.guid, self.path)
             self.__reference_guids = list1
         return self.__guid
 
