@@ -46,8 +46,7 @@ class Asset:
 
     def load(self, dir: str, load_references: bool = True) -> str:
         """
-        unitypackageからアセットの情報を取得します。
-        unitypackageを解凍した後、guidで区切られたアセットフォルダに対して解析を行います。
+        unitypackageを解凍した後のフォルダを解析し、アセットの情報を取得します。
         """
         with open(os.path.join(dir, 'pathname')) as fp:
             self.__path = fp.read()
@@ -55,14 +54,14 @@ class Asset:
         self.__guid = os.path.basename(dir)
 
         if load_references:
+            # 依存関係を取得するために、GUIDを検索して取得します。
             list1 = Asset.__getGuid(os.path.join(dir, 'asset.meta'))
             list2 = Asset.__getGuid(os.path.join(dir, 'asset'))
             list1.update(list2)
             if self.__guid in list1:
                 list1.pop(self.__guid)
             else:
-                Asset.__logger.warning('there is no own guid in asset.meta. guid = %s, path = %s',
-                                       self.guid, self.path)
+                Asset.__logger.warning('there is no own guid in asset.meta. guid = %s, path = %s', self.guid, self.path)
             self.__reference_guids = list1
         return self.__guid
 
@@ -83,6 +82,9 @@ class Asset:
         return self.__reference_guids
 
     def toDict(self, reference_info_include: bool = True) -> Dict[str, Any]:
+        """
+        クラスインスタンスを辞書型へシリアライズする。
+        """
         ret: Dict[str, Any] = {
             'guid': self.guid,
             'path': self.path,
@@ -100,6 +102,9 @@ class Asset:
 
     @classmethod
     def __getGuid(self, filepath: str) -> Dict[str, None]:
+        """
+        asset, もしくはasset.metaを解析し、含まれるGUIDを探し出す。
+        """
         matched: Dict[str, None] = {}
         try:
             fstr = ''
@@ -185,3 +190,13 @@ class Unitypackage:
             'assets': assets
         }
         return ret
+
+    @classmethod
+    def checkDuplicationGuid(cls, unitypackages: list) -> bool:
+        marged: Dict[str, Any] = {}
+        sz = 0
+        for upack in unitypackages:
+            sz += len(upack.assets)
+            dt = upack.toDict()
+            marged.update(dt['assets'])
+        return (len(marged) == sz)
