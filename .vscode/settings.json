@@ -3,14 +3,15 @@
     "python.linting.mypyEnabled": true,
     "python.linting.flake8Args": [
         "--max-line-length",
-        "1000"
+        "120"
     ],
     "python.formatting.autopep8Args": [
         "--ignore",
         "E70",
         "--max-line-length",
-        "1000",
+        "120",
     ],
     "editor.formatOnSave": true,
-    "python.linting.pylintEnabled": false
+    "python.linting.pylintEnabled": false,
+    "python.pythonPath": "d:\\works\\programs\\python\\vemt\\vemt-unitypackage-validator\\vemt\\Scripts\\python.exe"
 }

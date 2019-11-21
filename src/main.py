@@ -1,47 +1,99 @@
-# (c) 2019 lb-vr - WhiteAtelier
-import sys
-import argparse
-import logging
-import getpass
+import tempfile
+import os
+import json
 
-from . import logger_setup
-from . import settings
-from .analyzer import analyzer
-from .rule import rule
+from .unitypackage import Unitypackage
+
+from .validators.reference_whitelist import ReferenceWhitelist
+from .validators.include_common_asset import IncludeCommonAsset
+from .validators.prohibited_modifing import ProhibitedModifing
 
 
-def main():
-    # parse arguments
-    parser = argparse.ArgumentParser(description='Unitypackage validator.')
-    parser.add_argument('-m', '--mode', help='switch mode.', choices=['validator', 'makerule'], default='validator')
-    parser.add_argument('-b', '--batch', help='work on batch mode.', action='store_true')
-    parser.add_argument('-q', '--quiet', help='mute stdout flag.', action='store_true')
-    parser.add_argument('-i', '--import-packages', help='common asset unitypackage(s).', nargs='*', default=[])
-    parser.add_argument('-o', '--output', help='output validating result formatted json.', type=str, default='result.json')
-    parser.add_argument('-s', '--settings', help='filepath of settings file.', type=str, default='settings.toml')
-    parser.add_argument('-a', '--author', help='author name', type=str, default=getpass.getuser())
-    parser.add_argument('-r', '--rule', help='URL of rule file. If you specified, overwrite rule url settings.', type=str, default='')
-    # parser.add_argument('-rd', '--redirect', help='redirect output json string to stdout.', action='store_true')
-    parser.add_argument('-l', '--log', help='select log level of stderr. default is "error"', choices=['debug', 'info', 'warn', 'error'], default='error')
-    args = parser.parse_args()
+def main(unitypackage_fpath: str):
+    # to absolute path
+    unitypackage_fpath = os.path.abspath(unitypackage_fpath)
 
-    # setup logger
-    lg = logger_setup.setupLogger('unitypackage-validator', {'debug': logging.DEBUG, 'info': logging.INFO, 'warn': logging.WARN, 'error': logging.ERROR}[args.log])
+    # Open File
+    with tempfile.TemporaryDirectory() as tmpdir:
+        print(tmpdir)
+        # extract dir
+        try:
+            Unitypackage.extract(unitypackage_fpath, tmpdir)
 
-    # opening log
-    lg.info('Unitypackage Validator version 0.0.1')
-    lg.debug('arguments = %s', args)
+            # set instance
+            unity_package = Unitypackage(os.path.basename(unitypackage_fpath))
 
-    # load settings
-    if not settings.GlobalSettings.loadFromFile(args.settings):
-        exit(-1)
+            # load
+            unity_package.load(tmpdir)
 
-    # open ui or validating
-    if args.batch:
-        if args.mode == 'validator':
-            analyzer.batch_main(args)
-        else:
-            rule.batch_main(args)
-    else:
-        # open ui but not implemented yet.
-        raise RuntimeWarning('UI has not been implemented yet.')
+            # unitypackageの準備はできた
+
+            # load rule
+            rule: dict = {}
+            with open(os.path.abspath("rule_new.json"), mode="r", encoding="utf-8") as jf:
+                rule = json.load(jf)
+
+            # 1. 含んではいけないアセット
+            # つまり、再配布禁止なもの、VRCSDK、アセットストアのもの、など。
+            # ルール名は「includes_blacklist」
+
+            # 2. 含んではいけないファイル群
+            # ファイルに対するフィルタで、該当する者は削除する
+            # ルール名は「filename_blacklist」
+            # ファイル名は正規表現でマッチングを行う。
+            # 例えば、.cs（スクリプトファイル）, *.dll, *.exe, *.blend, *.mb, *.maなど？
+
+            # 3. 改変可能なアセットだが、全く未改変なファイル群
+            # 改変した場合は含めなくてはいけないが、全く未改変なファイル群であれば削除する
+            # とりあえず、削除する単位は、以下の例外を除いて、unitypackage単位とする
+            # ルール名は「modifing_whitelist」
+            # 例えば、シェーダーコード等である。
+
+            # 3-1-1. それらが.shaderだった場合
+            # 中で呼び出しているcgincファイルが、テストファイルの中に含まれているか確かめる
+            # 含まれていなかったらエラー
+
+            # 3-1-2. .shaderの一部が未改変だった場合
+            # .shaderは削除して良い
+
+            # 3-1-3. .cgincの一部が未改変だった場合
+            # かつ、参照カウントを設けて、テストファイル内の、どの.shader, .cgincからもインクルードされていない場合は、それを削除する
+
+            # 3-2 それらがTextureだった場合
+            # 未改変なtextureは削除する
+
+            # 4. 残った.shader、.cgincに対して、含まれるIncludesがAssets/からの絶対パスになっていないか
+            # 処理が終わるとファイルパスがごっそり変わる
+            # シェーダーファイルに対して絶対パスのincludeがあればエラーとする
+
+            # 5. テクスチャファイル、シェーダーファイルに関して、参照されていないものを削除する
+            # テクスチャもシェーダーも、unityに取り込んだ時点でコンパイルが走る。重たいので削除する
+
+            # 6. 参照先不明なものをエラーとする
+            # ここまでとことん削ったが、この後、自己参照・共通アセット参照のいずれでもないアセットを参照エラーとする。
+            # ルール名は「reference_whitelist」
+
+            # 7. 全てのshaderの名前空間を掘り下げる
+            # 指定された文字列を頭につけて、名前空間を掘り下げる。
+
+            # 8. 全てのアセットのフォルダを、指定された文字列をルートフォルダとするように変更する
+
+            ###########################################################################################
+
+            # 1. 改変不可能なアセットが含まれていないか
+            # つまり、このアセット群は含めてはいけないもの。
+            # ルールとしては、「改変可能で含めても良いアセット」から漏れたものを削除する。
+            # ルール名は「permitted_modifing」で、「改変可能、かつ改変時は含めて良いアセット」を指定する
+            prohibited_modifing = ProhibitedModifing(unity_package, rule)
+            prohibited_modifing.run()
+
+            # 1. 未同梱・参照ファイルのチェック
+            reference_whitelist = ReferenceWhitelist(unity_package, rule)
+            reference_whitelist.run()
+
+            # 2. 共通アセットが含まれているか
+            include_common_asset = IncludeCommonAsset(unity_package, rule)
+            include_common_asset.run()
+
+        except FileNotFoundError as e:
+            print(e)
