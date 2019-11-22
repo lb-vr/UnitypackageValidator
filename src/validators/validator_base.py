@@ -1,7 +1,8 @@
 import abc
+import logging
 
 from typing import List, Optional
-from ..unitypackage import Unitypackage, Asset
+from unitypackage import Unitypackage, Asset
 
 
 class ValidatorBase(metaclass=abc.ABCMeta):
@@ -11,6 +12,7 @@ class ValidatorBase(metaclass=abc.ABCMeta):
         self.__rule_name: str = rule_name
         self.__logs: List[str] = []
         self.__notices: List[str] = []
+        self.__logger: logging.Logger = logging.getLogger(self.__class__.__name__)
 
     @property
     def unitypackage(self) -> Unitypackage:
@@ -24,6 +26,10 @@ class ValidatorBase(metaclass=abc.ABCMeta):
     def rule_name(self) -> str:
         return self.__rule_name
 
+    @property
+    def logger(self) -> logging.Logger:
+        return self.__logger
+
     @abc.abstractmethod
     def doIt(self) -> bool:
         pass
@@ -36,6 +42,12 @@ class ValidatorBase(metaclass=abc.ABCMeta):
 
     def appendNotice(self, message: str, asset: Optional[Asset] = None):
         self.__notices.append(message + self.__assetToMsg(asset))
+
+    def createRuleFromUnitypackage(self, unitypackages: List[Unitypackage], with_hash: bool = False) -> dict:
+        ret: dict = {self.rule_name: {}}
+        for upkg in unitypackages:
+            ret[self.rule_name][upkg.name] = upkg.toDict(with_hash)
+        return ret
 
     def __assetToMsg(self, asset: Optional[Asset]):
         return " GUID {0.guid} ({0.path})".format(asset) if asset else " < No Asset >"

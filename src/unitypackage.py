@@ -4,6 +4,7 @@ import tarfile
 import re
 import enum
 import shutil
+import hashlib
 from typing import List, Dict, Optional
 
 
@@ -74,6 +75,7 @@ class Asset:
         self.__references: Optional[List[str]] = None
         self.__filetype: Optional[AssetType] = None
         self.__deleted: bool = False
+        self.__hash = None
 
     @property
     def guid(self) -> str:
@@ -98,6 +100,13 @@ class Asset:
     @property
     def path(self) -> Optional[str]:
         return self.__path
+
+    @property
+    def hash(self) -> str:
+        if not self.__hash:
+            with open(self.data_fpath, mode="rb") as asset_data_f:
+                self.__hash = hashlib.sha512(asset_data_f.read()).hexdigest()
+        return self.__hash
 
     @property
     def references(self) -> Optional[List[str]]:
@@ -138,6 +147,30 @@ class Asset:
             self.__deleted = True
             shutil.rmtree(self.root_dpath)
 
+    def toDict(self, with_hash: bool = False) -> Dict[str, Dict[str, str]]:
+        # Noneチェック
+        assert self.path, '"path" must not be None. Did you call load() function?'
+        assert self.filetype, '"filetype" must not be None. Did you call load() function?'
+        assert not self.deleted, "This asset[{}] is deleted.".format(str(self))
+
+        # 戻り値
+        ret: Dict[str, Dict[str, str]] = {
+            self.guid: {
+                "guid": self.guid,
+                "path": self.path,
+                "type": self.filetype.name
+            }
+        }
+
+        # ハッシュ生成
+        if with_hash:
+            ret[self.guid]["hash"] = self.hash
+
+        return ret
+
+    def __str__(self) -> str:
+        return "{0.guid} ({0.path})".format(self)
+
     @classmethod
     def __getReferences(cls, fpath: str) -> List[str]:
         ret: List[str] = []
@@ -148,6 +181,8 @@ class Asset:
                 matched_list = guid_regex_rule.findall(fstr)
                 for m in matched_list:
                     ret.append(m[6:])
+        except FileNotFoundError:
+            pass  # Directory
         except UnicodeDecodeError:
             pass
         return ret
@@ -156,8 +191,10 @@ class Asset:
 #######################################################################################################################
 # Unitypackage Class
 # + __init__
-# + load
-# + extract
+# + name
+# + assets
+# + load()
+# + extract()
 #######################################################################################################################
 class Unitypackage:
 
@@ -179,8 +216,22 @@ class Unitypackage:
             self.__assets[f].load()
 
     @property
+    def name(self) -> str:
+        return self.__unitypackage_name
+
+    @property
     def assets(self) -> Dict[str, Asset]:
         return self.__assets
+
+    def toDict(self, with_hash: bool = False) -> Dict[str, Dict[str, Dict[str, str]]]:
+        ret: Dict[str, Dict[str, Dict[str, str]]] = {
+            self.name: {}
+        }
+        for asset in self.assets.values():
+            if not asset.deleted:
+                ret[self.name].update(asset.toDict(with_hash))
+
+        return ret
 
     @classmethod
     def extract(cls, unitypackage_fpath: str, destination_dpath: str):

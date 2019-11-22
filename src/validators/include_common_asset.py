@@ -4,7 +4,7 @@ import logging
 from typing import Dict
 
 from .validator_base import ValidatorBase
-from ..unitypackage import Asset
+from unitypackage import Asset
 
 
 class IncludeCommonAsset(ValidatorBase):

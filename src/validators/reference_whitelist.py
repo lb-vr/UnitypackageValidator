@@ -2,7 +2,7 @@ import re
 import logging
 
 from .validator_base import ValidatorBase
-from ..unitypackage import Unitypackage
+from unitypackage import Unitypackage
 
 
 class ReferenceWhitelist(ValidatorBase):

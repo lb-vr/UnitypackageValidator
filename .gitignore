@@ -12,6 +12,7 @@ common_packages/*.unitypackage
 .mypy_cache/
 vemt/
 .vscode
+vemt-upkg/
 
 # Distribution / packaging
 .Python
