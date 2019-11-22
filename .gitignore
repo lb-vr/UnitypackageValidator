@@ -10,6 +10,8 @@ common_packages/*.unitypackage
 # C extensions
 *.so
 .mypy_cache/
+vemt/
+.vscode
 
 # Distribution / packaging
 .Python

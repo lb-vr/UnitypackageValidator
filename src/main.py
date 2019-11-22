@@ -4,6 +4,8 @@ import json
 
 from .unitypackage import Unitypackage
 
+from .validators.includes_blacklist import IncludesBlacklist
+
 from .validators.reference_whitelist import ReferenceWhitelist
 from .validators.include_common_asset import IncludeCommonAsset
 from .validators.prohibited_modifing import ProhibitedModifing
@@ -36,6 +38,8 @@ def main(unitypackage_fpath: str):
             # 1. 含んではいけないアセット
             # つまり、再配布禁止なもの、VRCSDK、アセットストアのもの、など。
             # ルール名は「includes_blacklist」
+            ib = IncludesBlacklist(unity_package, rule)
+            ib.run()
 
             # 2. 含んではいけないファイル群
             # ファイルに対するフィルタで、該当する者は削除する

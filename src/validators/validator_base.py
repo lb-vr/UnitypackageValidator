@@ -18,7 +18,7 @@ class ValidatorBase(metaclass=abc.ABCMeta):
 
     @property
     def rule(self) -> dict:
-        return self.__rule
+        return self.__rule[self.rule_name]
 
     @property
     def rule_name(self) -> str:
