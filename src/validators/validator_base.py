@@ -19,8 +19,11 @@ class ValidatorBase(metaclass=abc.ABCMeta):
         return self.__unitypackage
 
     @property
-    def rule(self) -> dict:
-        return self.__rule[self.rule_name]
+    def rule(self) -> Optional[dict]:
+        if "rules" in self.__rule:
+            if self.rule_name in self.__rule["rules"]:
+                return self.__rule["rules"][self.rule_name]
+        return None
 
     @property
     def rule_name(self) -> str:
@@ -35,7 +38,7 @@ class ValidatorBase(metaclass=abc.ABCMeta):
         pass
 
     def run(self) -> bool:
-        return self.doIt() if self.rule_name in self.rule else True
+        return self.doIt() if self.rule else True
 
     def appendLog(self, message: str, asset: Optional[Asset] = None):
         self.__logs.append(message + self.__assetToMsg(asset))
@@ -43,11 +46,19 @@ class ValidatorBase(metaclass=abc.ABCMeta):
     def appendNotice(self, message: str, asset: Optional[Asset] = None):
         self.__notices.append(message + self.__assetToMsg(asset))
 
+    def getLog(self) -> List[str]:
+        return self.__logs
+
+    def getNotice(self) -> List[str]:
+        return self.__notices
+
+    """
     def createRuleFromUnitypackage(self, unitypackages: List[Unitypackage], with_hash: bool = False) -> dict:
         ret: dict = {self.rule_name: {}}
         for upkg in unitypackages:
             ret[self.rule_name][upkg.name] = upkg.toDict(with_hash)
         return ret
+        """
 
     def __assetToMsg(self, asset: Optional[Asset]):
         return " GUID {0.guid} ({0.path})".format(asset) if asset else " < No Asset >"

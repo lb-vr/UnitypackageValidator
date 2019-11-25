@@ -3,12 +3,16 @@ import webbrowser
 import re
 import tempfile
 import logging
+import datetime
+import json
 # import pyperclip
 
 from typing import List, Tuple, Optional, Dict, Any
 
+
 from PySide2.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QTreeWidgetItem, QFormLayout, QLineEdit, QLabel
-from PySide2.QtWidgets import QTreeWidget, QSpinBox, QCheckBox, QComboBox, QHBoxLayout, QPushButton, QSizePolicy, QProgressBar
+from PySide2.QtWidgets import QTreeWidget, QSpinBox, QCheckBox, QComboBox, QHBoxLayout, QPushButton, QSizePolicy
+from PySide2.QtWidgets import QListWidgetItem, QProgressBar, QListWidget
 from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 
@@ -30,37 +34,55 @@ class MainWindow(QMainWindow):
         self.__logger: logging.Logger = logging.getLogger("MainWindow")
 
         # ボタン
-        self.addActionsForUnitypackageButton(["IncludesBlacklist"])
+        self.ui.FileBlacklist_Add.clicked.connect(self.clickedAddFileBlacklist)
+        self.ui.FileBlacklist_Del.clicked.connect(self.clickedDeleteFileBlacklist)
+        self.ui.IncludesBlacklist_AddPkg.clicked.connect(self.clickedAddIncludesBlacklist)
+        self.ui.ModifiableAsset_AddPkg.clicked.connect(self.clickedAddModifiableAsset)
+        self.ui.CommonAsset_AddPkg.clicked.connect(self.clickedAddCommonAsset)
+
+        # TreeWidget
+        self.ui.IncludesBlacklist_tw.itemChanged.connect(self.itemChangedIncludesBlacklist)
+        self.ui.ModifiableAsset_tw.itemChanged.connect(self.itemChangedModifiableAsset)
+        self.ui.CommonAsset_tw.itemChanged.connect(self.itemChangedCommonAsset)
+
+        # トリガー
+        self.ui.actionExport.triggered.connect(self.export)
+
         self.__is_catch_item_changed = True
 
     @property
     def logger(self) -> logging.Logger:
         return self.__logger
 
-    def addActionsForUnitypackageButton(self, component_name_list: List[str]):
-        """
-        シグナルを接続するためのユーティリティー関数
-        Unitypackageを読み込んで、TreeWidgetに表示させる動作を登録する
-        """
-        for n in component_name_list:
-            cmp_add_name: str = n + "_AddPkg"
-            cmp_del_name: str = n + "_DelPkg"
-            cmp_trw_name: str = n + "_tw"
+    #####
+    # イベントハンドラ
+    #####
 
-            assert hasattr(self.ui, cmp_trw_name)
-            assert hasattr(self.ui, cmp_add_name)
-            assert hasattr(self.ui, cmp_del_name)
+    def clickedAddIncludesBlacklist(self):
+        self.addUnitypackage(self.ui.IncludesBlacklist_tw)
 
-            getattr(self.ui, cmp_add_name).clicked.connect(
-                lambda: self.addUnitypackage(getattr(self.ui, cmp_trw_name)))
-            getattr(self.ui, cmp_trw_name).itemChanged.connect(
-                lambda itm, clm: self.changedTreeWidgetItem(
-                    getattr(self.ui, cmp_trw_name), itm, clm))
+    def clickedAddModifiableAsset(self):
+        self.addUnitypackage(self.ui.ModifiableAsset_tw)
+
+    def clickedAddCommonAsset(self):
+        self.addUnitypackage(self.ui.CommonAsset_tw)
+
+    def itemChangedIncludesBlacklist(self, itm: QTreeWidgetItem, clm: int):
+        self.changedTreeWidgetItem(self.ui.IncludesBlacklist_tw, itm, clm)
+
+    def itemChangedModifiableAsset(self, itm: QTreeWidgetItem, clm: int):
+        self.changedTreeWidgetItem(self.ui.ModifiableAsset_tw, itm, clm)
+
+    def itemChangedCommonAsset(self, itm: QTreeWidgetItem, clm: int):
+        self.changedTreeWidgetItem(self.ui.CommonAsset_tw, itm, clm)
+
+    #####
+    # 操作系
+    #####
 
     def addUnitypackage(self, target_treewidget: QTreeWidget):
         """
         実際にUnitypackageを読み込んで、TreeWidgetに登録する
-        TODO: 既に読み込まれたunitypackageをルートノードから判別して、新規のもののみに絞る
         """
         self.logger.debug("Adding an unitypackage.")
         ret = QFileDialog.getOpenFileName(self, "ファイルを開く", "/", "Unitypackage (*.unitypackage)")
@@ -124,6 +146,9 @@ class MainWindow(QMainWindow):
                 _addTreeWidget(unity_package.name, target_treewidget, {unity_package.name: pathobj})
                 self.__is_catch_item_changed = True
 
+    def deleteUnitypackage(self, target_treewidget: QTreeWidget):
+        QMessageBox.warning(None, "未実装", "Not implemented.")
+
     def changedTreeWidgetItem(self, tree_widget: QTreeWidget, item: QTreeWidgetItem, column: int):
         if not self.__is_catch_item_changed:
             return
@@ -150,3 +175,80 @@ class MainWindow(QMainWindow):
 
                 if parent_check_state is not None:
                     parent.setCheckState(0, parent_check_state)
+
+    def clickedAddFileBlacklist(self):
+        """
+        新しいブラックリストを追加する
+        """
+        itm: QListWidgetItem = QListWidgetItem(self.ui.FileBlacklist_list)
+        itm.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled |
+                     QtCore.Qt.ItemFlag.ItemIsEditable |
+                     QtCore.Qt.ItemFlag.ItemIsSelectable)
+        itm.setText("<< Edit here >>")
+
+    def clickedDeleteFileBlacklist(self):
+        """
+        選択したブラックリストを削除する
+        """
+        row: int = self.ui.FileBlacklist_list.currentRow()
+        self.ui.FileBlacklist_list.takeItem(row)
+
+    def export(self):
+        """
+        jsonへ出力する
+        """
+        items_ok = True
+        # TODO: ここに値がセットされているかチェック
+
+        ret = QFileDialog.getSaveFileName(self, "ルールファイルを保存", "/", "Json (*.json)")
+        if not ret:
+            return
+
+        jsonobj = {
+            "created_at": "{0:%Y-%m-%d %H:%M:%S}".format(datetime.datetime.now()),
+            "author": self.ui.tbRuleAuthor.text(),
+            "version": self.ui.tbRuleVersion.text() if self.ui.tbRuleVersion.text() else None,
+            "event": {
+                "name": self.ui.tbEventName.text(),
+                "author": self.ui.tbEventAuthor.text() if self.ui.tbEventAuthor.text() else None,
+                "homepage": self.ui.tbHomepageUrl.text() if self.ui.tbHomepageUrl.text() else None
+            },
+            "rules": {
+                "includes_blacklist": {},
+                "file_blacklist": [],
+                "modifiable_assets": {},
+                "common_assets": {}
+            }
+        }
+
+        def _putItem(target, item: QTreeWidgetItem):
+            if item.checkState(0):  # PartiallyChecked or Checked
+                dt = item.data(0, QtCore.Qt.UserRole)
+                next_target = target
+                if type(dt) is Asset:
+                    target.update(dt.toDict(True))
+
+                elif type(dt) is Unitypackage:
+                    target[dt.name] = {}
+                    next_target = target[dt.name]
+
+                for child_index in range(item.childCount()):
+                    _putItem(next_target, item.child(child_index))
+
+        def _putTree(target, target_treewidget: QTreeWidget):
+            for item_index in range(target_treewidget.topLevelItemCount()):
+                _putItem(target, target_treewidget.topLevelItem(item_index))
+
+        def _putList(target: list, target_listwidget: QListWidget):
+            for item_index in range(target_listwidget.count()):
+                target.append(target_listwidget.item(item_index).text())
+
+        # includes blacklist
+        _putTree(jsonobj["rules"]["includes_blacklist"], self.ui.IncludesBlacklist_tw)
+        _putList(jsonobj["rules"]["file_blacklist"], self.ui.FileBlacklist_list)
+        _putTree(jsonobj["rules"]["modifiable_assets"], self.ui.ModifiableAsset_tw)
+        _putTree(jsonobj["rules"]["common_assets"], self.ui.CommonAsset_tw)
+
+        # Output file
+        with open(ret[0], encoding="utf-8", mode="w") as jsonf:
+            json.dump(jsonobj, jsonf)

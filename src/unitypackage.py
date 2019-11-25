@@ -102,10 +102,7 @@ class Asset:
         return self.__path
 
     @property
-    def hash(self) -> str:
-        if not self.__hash:
-            with open(self.data_fpath, mode="rb") as asset_data_f:
-                self.__hash = hashlib.sha512(asset_data_f.read()).hexdigest()
+    def hash(self) -> Optional[str]:
         return self.__hash
 
     @property
@@ -125,6 +122,13 @@ class Asset:
         with open(self.path_fpath, mode="r") as fp:
             self.__path = fp.readline().strip()
         self.__filetype = AssetType.getFromFilename(self.path)
+
+        # calc hash
+        try:
+            with open(self.data_fpath, mode="rb") as asset_data_f:
+                self.__hash = hashlib.sha512(asset_data_f.read()).hexdigest()
+        except FileNotFoundError:
+            pass  # Directory
 
         # get references
         meta_ref = Asset.__getReferences(self.meta_fpath)
@@ -147,14 +151,14 @@ class Asset:
             self.__deleted = True
             shutil.rmtree(self.root_dpath)
 
-    def toDict(self, with_hash: bool = False) -> Dict[str, Dict[str, str]]:
+    def toDict(self, with_hash: bool = False) -> Dict[str, Dict[str, Optional[str]]]:
         # Noneチェック
         assert self.path, '"path" must not be None. Did you call load() function?'
         assert self.filetype, '"filetype" must not be None. Did you call load() function?'
         assert not self.deleted, "This asset[{}] is deleted.".format(str(self))
 
         # 戻り値
-        ret: Dict[str, Dict[str, str]] = {
+        ret: Dict[str, Dict[str, Optional[str]]] = {
             self.guid: {
                 "guid": self.guid,
                 "path": self.path,
