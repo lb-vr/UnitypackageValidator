@@ -20,6 +20,7 @@ class FilenameBlacklist(ValidatorBase):
             filename = os.path.basename(asset.path)
             for r in self.rule:
                 if fnmatch.fnmatch(filename, r):
+                    asset.delete()
                     self.appendLog("同梱不可なファイルが含まれていたので、削除しました。", asset)
                     FilenameBlacklist.__logger.warning(
                         "[ N G ] Included blackfile and removed. Asset is {0.guid} ({0.path})".format(asset))

@@ -31,4 +31,4 @@ if __name__ == "__main__":
 
     else:
         # validator_main("test.unitypackage", "test.json")
-        validator_main(r"c:\Users\shirao\Downloads\UnityChanToonShaderVer2_Project_v207_5\UnityChanToonShaderVer2_Project_v207_5\UTS2_ShaderOnly_v2.0.7_Release.unitypackage", "test.json")
+        validator_main(r"W:\testcase1.unitypackage", "test.json", "29310049234")

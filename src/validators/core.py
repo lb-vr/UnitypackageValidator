@@ -10,9 +10,13 @@ from unitypackage import Unitypackage, Asset
 from validators.includes_blacklist import IncludesBlacklist
 from validators.filename_blacklist import FilenameBlacklist
 from validators.modifiable_asset import ModifiableAsset
+from validators.floating_asset import FloatingAsset
+from validators.reference_whitelist import ReferenceWhitelist
+from validators.modify_shader_namespace import ModifyShaderNamespace
+from validators.modify_root_directory import ModifyRootDirectory
 
 
-def validator_main(unitypackage_fpath: str, rule_fpath: str) -> List[Tuple[str, List[str], List[str]]]:
+def validator_main(unitypackage_fpath: str, rule_fpath: str, user_id: str) -> List[Tuple[str, List[str], List[str]]]:
 
     ret: List[Tuple[str, List[str], List[str]]] = []
 
@@ -80,18 +84,29 @@ def validator_main(unitypackage_fpath: str, rule_fpath: str) -> List[Tuple[str, 
             # 4. 残った.shader、.cgincに対して、含まれるIncludesがAssets/からの絶対パスになっていないか
             # 処理が終わるとファイルパスがごっそり変わる
             # シェーダーファイルに対して絶対パスのincludeがあればエラーとする
+            # ## 今はパス
 
             # 5. テクスチャファイル、シェーダーファイルに関して、参照されていないものを削除する
             # テクスチャもシェーダーも、unityに取り込んだ時点でコンパイルが走る。重たいので削除する
+            fa = FloatingAsset(unity_package)
+            fa.run()
+            ret.append(("参照されていないアセットの削除", fa.getLog(), []))
 
             # 6. 参照先不明なものをエラーとする
             # ここまでとことん削ったが、この後、自己参照・共通アセット参照のいずれでもないアセットを参照エラーとする。
             # ルール名は「reference_whitelist」
+            rw = ReferenceWhitelist(unity_package, rule)
+            rw.run()
+            ret.append(("共通アセット", rw.getLog(), rw.getNotice()))
 
             # 7. 全てのshaderの名前空間を掘り下げる
             # 指定された文字列を頭につけて、名前空間を掘り下げる。
+            msn = ModifyShaderNamespace(unity_package, user_id)
+            msn.run()
 
             # 8. 全てのアセットのフォルダを、指定された文字列をルートフォルダとするように変更する
+            mrd = ModifyRootDirectory(unity_package, user_id)
+            mrd.run()
 
             ###########################################################################################
 

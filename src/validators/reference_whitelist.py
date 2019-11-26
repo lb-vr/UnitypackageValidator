@@ -9,7 +9,7 @@ class ReferenceWhitelist(ValidatorBase):
     __logger = logging.getLogger("ReferenceWhitelist")
 
     def __init__(self, unitypackage: Unitypackage, rule: dict):
-        super().__init__(unitypackage, rule)
+        super().__init__("common_assets", unitypackage, rule)
 
     def doIt(self) -> bool:
         ret = True
@@ -29,10 +29,10 @@ class ReferenceWhitelist(ValidatorBase):
                     continue
 
                 is_found: bool = False
-                for upkg in self.rule["reference_whitelist"].values():
+                for upkg in self.rule.values():
                     if ref in upkg.keys():
                         is_found = True
-                        ReferenceWhitelist.__logger.debug("- Found. Asset = %s", upkg[ref].path)
+                        ReferenceWhitelist.__logger.debug("- Found. Asset %s (%s)", ref, upkg[ref]["path"])
                         break
                 if is_found:
                     continue
