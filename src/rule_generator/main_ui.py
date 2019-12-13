@@ -47,6 +47,8 @@ class MainWindow(QMainWindow):
 
         # トリガー
         self.ui.actionExport.triggered.connect(self.export)
+        self.ui.actionSave.triggered.connect(self.save)
+        self.ui.actionOpen.triggered.connect(self.open)
 
         self.__is_catch_item_changed = True
 
@@ -80,6 +82,47 @@ class MainWindow(QMainWindow):
     # 操作系
     #####
 
+    def __addUnitypackage(self, target_treewidget: QTreeWidget, unitypackage: Unitypackage):
+        # ----------------------------------------------
+        # unitypackageのアセットをパスの形に直す
+        # 再帰的解析
+        def _path(target, splitted_path: List[str], asset: Asset):
+            if len(splitted_path) == 0:
+                target[1] = asset
+            else:
+                if splitted_path[0] not in target[0]:
+                    target[0][splitted_path[0]] = [{}, None]
+                _path(target[0][splitted_path[0]], splitted_path[1:], asset)
+
+        # ただしAssets/は抜く
+        pathobj = [{}, unitypackage]
+        for asset in unitypackage.assets.values():
+            if asset.path.startswith("Assets/"):
+                splitted_path = asset.path.split("/")[1:]
+                _path(pathobj, splitted_path, asset)
+
+        # ----------------------------------------------
+        # unitypackageからTreeWidgetへ追加
+        def _addTreeWidget(upkg_name, target, obj):
+            for k, v in obj.items():
+                item = QTreeWidgetItem(target)
+                item.setText(0, k)
+                item.setCheckState(0, QtCore.Qt.CheckState.Checked)
+                item.setText(2, upkg_name)
+                if v[1]:
+                    item.setData(0, QtCore.Qt.UserRole, v[1])
+                    if type(v[1]) is Asset:
+                        item.setText(1, v[1].guid)
+                        if v[1].enabled is not None:
+                            if v[1].enabled is False:
+                                item.setCheckState(0, QtCore.Qt.CheckState.Unchecked)
+                if v[0]:
+                    _addTreeWidget(upkg_name, item, v[0])
+
+        self.__is_catch_item_changed = False
+        _addTreeWidget(unitypackage.name, target_treewidget, {unitypackage.name: pathobj})
+        self.__is_catch_item_changed = True
+
     def addUnitypackage(self, target_treewidget: QTreeWidget):
         """
         実際にUnitypackageを読み込んで、TreeWidgetに登録する
@@ -109,42 +152,7 @@ class MainWindow(QMainWindow):
                 # load
                 unity_package.load(tmpdir)
 
-                # ----------------------------------------------
-                # unitypackageのアセットをパスの形に直す
-                # 再帰的解析
-                def _path(target, splitted_path: List[str], asset: Asset):
-                    if len(splitted_path) == 0:
-                        target[1] = asset
-                    else:
-                        if splitted_path[0] not in target[0]:
-                            target[0][splitted_path[0]] = [{}, None]
-                        _path(target[0][splitted_path[0]], splitted_path[1:], asset)
-
-                # ただしAssets/は抜く
-                pathobj = [{}, unity_package]
-                for asset in unity_package.assets.values():
-                    if asset.path.startswith("Assets/"):
-                        splitted_path = asset.path.split("/")[1:]
-                        _path(pathobj, splitted_path, asset)
-
-                # ----------------------------------------------
-                # unitypackageからTreeWidgetへ追加
-                def _addTreeWidget(upkg_name, target, obj):
-                    for k, v in obj.items():
-                        item = QTreeWidgetItem(target)
-                        item.setText(0, k)
-                        item.setCheckState(0, QtCore.Qt.CheckState.Checked)
-                        item.setText(2, upkg_name)
-                        if v[1]:
-                            item.setData(0, QtCore.Qt.UserRole, v[1])
-                            if type(v[1]) is Asset:
-                                item.setText(1, v[1].guid)
-                        if v[0]:
-                            _addTreeWidget(upkg_name, item, v[0])
-
-                self.__is_catch_item_changed = False
-                _addTreeWidget(unity_package.name, target_treewidget, {unity_package.name: pathobj})
-                self.__is_catch_item_changed = True
+                self.__addUnitypackage(target_treewidget, unity_package)
 
     def deleteUnitypackage(self, target_treewidget: QTreeWidget):
         QMessageBox.warning(None, "未実装", "Not implemented.")
@@ -193,7 +201,31 @@ class MainWindow(QMainWindow):
         row: int = self.ui.FileBlacklist_list.currentRow()
         self.ui.FileBlacklist_list.takeItem(row)
 
-    def export(self):
+    def _putItem(self, target, item: QTreeWidgetItem, for_export: bool = True):
+        if item.checkState(0) != QtCore.Qt.CheckState.Unchecked or not for_export:  # PartiallyChecked or Checked
+            dt = item.data(0, QtCore.Qt.UserRole)
+            next_target = target
+            if type(dt) is Asset:
+                enabled: Optional[bool] = None if for_export else bool(
+                    item.checkState(0) == QtCore.Qt.CheckState.Checked)
+                target.update(dt.toDict(True, enabled))
+
+            elif type(dt) is Unitypackage:
+                target[dt.name] = {}
+                next_target = target[dt.name]
+
+            for child_index in range(item.childCount()):
+                self._putItem(next_target, item.child(child_index), for_export)
+
+    def _putTree(self, target, target_treewidget: QTreeWidget, for_export: bool = True):
+        for item_index in range(target_treewidget.topLevelItemCount()):
+            self._putItem(target, target_treewidget.topLevelItem(item_index), for_export)
+
+    def _putList(self, target: list, target_listwidget: QListWidget):
+        for item_index in range(target_listwidget.count()):
+            target.append(target_listwidget.item(item_index).text())
+
+    def _saveToJson(self, for_export: bool = True):
         """
         jsonへ出力する
         """
@@ -201,7 +233,7 @@ class MainWindow(QMainWindow):
         # TODO: ここに値がセットされているかチェック
 
         ret = QFileDialog.getSaveFileName(self, "ルールファイルを保存", "/", "Json (*.json)")
-        if not ret:
+        if not ret[0]:
             return
 
         jsonobj = {
@@ -221,34 +253,67 @@ class MainWindow(QMainWindow):
             }
         }
 
-        def _putItem(target, item: QTreeWidgetItem):
-            if item.checkState(0):  # PartiallyChecked or Checked
-                dt = item.data(0, QtCore.Qt.UserRole)
-                next_target = target
-                if type(dt) is Asset:
-                    target.update(dt.toDict(True))
-
-                elif type(dt) is Unitypackage:
-                    target[dt.name] = {}
-                    next_target = target[dt.name]
-
-                for child_index in range(item.childCount()):
-                    _putItem(next_target, item.child(child_index))
-
-        def _putTree(target, target_treewidget: QTreeWidget):
-            for item_index in range(target_treewidget.topLevelItemCount()):
-                _putItem(target, target_treewidget.topLevelItem(item_index))
-
-        def _putList(target: list, target_listwidget: QListWidget):
-            for item_index in range(target_listwidget.count()):
-                target.append(target_listwidget.item(item_index).text())
-
         # includes blacklist
-        _putTree(jsonobj["rules"]["includes_blacklist"], self.ui.IncludesBlacklist_tw)
-        _putList(jsonobj["rules"]["file_blacklist"], self.ui.FileBlacklist_list)
-        _putTree(jsonobj["rules"]["modifiable_assets"], self.ui.ModifiableAsset_tw)
-        _putTree(jsonobj["rules"]["common_assets"], self.ui.CommonAsset_tw)
+        self._putTree(jsonobj["rules"]["includes_blacklist"], self.ui.IncludesBlacklist_tw, for_export)
+        self._putList(jsonobj["rules"]["file_blacklist"], self.ui.FileBlacklist_list)
+        self._putTree(jsonobj["rules"]["modifiable_assets"], self.ui.ModifiableAsset_tw, for_export)
+        self._putTree(jsonobj["rules"]["common_assets"], self.ui.CommonAsset_tw, for_export)
 
         # Output file
         with open(ret[0], encoding="utf-8", mode="w") as jsonf:
             json.dump(jsonobj, jsonf)
+
+    def _gets(self, json_obj, keys: List[str], _type: Optional[type] = None, _default=None):
+        if len(keys) == 0:
+            if _type is not None:
+                if type(json_obj) is _type:
+                    return json_obj
+                else:
+                    return _default
+            else:
+                return json_obj
+        else:
+            if keys[0] in json_obj:
+                return self._gets(json_obj[keys[0]], keys[1:], _type, _default)
+            else:
+                return _default
+
+    def save(self):
+        self._saveToJson(False)
+        pass
+
+    def export(self):
+        self._saveToJson()
+
+    def open(self):
+        """
+        jsonを解析して起こす…
+        """
+
+        # 読み込むjsonを取得
+        ret = QFileDialog.getOpenFileName(self, "ルールファイルを開く", "/", "Json (*.json)")
+        if not ret[0]:
+            return
+
+        json_obj: dict = {}
+        with open(ret[0], encoding="utf-8", mode="r") as jsonf:
+            json_obj = json.load(jsonf)
+
+        # 全Item削除
+        self.ui.IncludesBlacklist_tw.clear()
+        self.ui.FileBlacklist_list.clear()
+        self.ui.ModifiableAsset_tw.clear()
+        self.ui.CommonAsset_tw.clear()
+
+        # メタデータ
+        self.ui.tbRuleAuthor.setText(self._gets(json_obj, ["author"], str, ""))
+        self.ui.tbRuleVersion.setText(self._gets(json_obj, ["version"], str, ""))
+        self.ui.tbEventName.setText(self._gets(json_obj, ["event", "name"], str, ""))
+        self.ui.tbEventAuthor.setText(self._gets(json_obj, ["event", "author"], str, ""))
+        self.ui.tbHomepageUrl.setText(self._gets(json_obj, ["event", "homepage"], str, ""))
+
+        # TreeWidgetに再現
+        # の前に、Unitypackageを作成
+        for k, v in self._gets(json_obj, ["rules", "includes_blacklist"], dict, {}).items():
+            upkg = Unitypackage.createFromJsonDict({k: v})
+            self.__addUnitypackage(self.ui.IncludesBlacklist_tw, upkg)

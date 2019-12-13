@@ -65,9 +65,6 @@ def validator_main(unitypackage_fpath: str, rule_fpath: str) -> List[Tuple[str, 
             # 中で呼び出しているcgincファイルが、テストファイルの中に含まれているか確かめる
             # 含まれていなかったらエラー
 
-            # (3-1-2. .shaderの一部が未改変だった場合
-            # (.shaderは削除して良い
-
             # 3-1-3. .cgincの一部が未改変だった場合
             # かつ、参照カウントを設けて、テストファイル内の、どの.shader, .cgincからもインクルードされていない場合は、それを削除する
 
