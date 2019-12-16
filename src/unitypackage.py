@@ -28,7 +28,7 @@ class AssetType(enum.Enum):
     kTexture = ("png", "jpg", "jpeg", "bmp")
     kHdrTexture = ("exr", "hdr", "tif", "tiff")
     kScene = ("unity",)
-    kShader = ("shader", "cginc")
+    kShader = ("shader", "cginc", "glslinc")
     kMaterial = ("mat",)
     kModel = ("fbx", "obj")
     kAnimation = ("anim", "controller")
@@ -171,7 +171,7 @@ class Asset:
             }
         }
         if enabled is not None:
-            ret[self.guid]["enable"] = enabled
+            ret[self.guid]["enabled"] = enabled
 
         # ハッシュ生成
         if with_hash:
@@ -181,7 +181,15 @@ class Asset:
 
     def __putFromJson(self, jdict: dict):
         self.__path = jdict["path"]
-        self.__filetype = None  # TODO: 文字列からパース
+        try:
+            self.__filetype = AssetType[jdict["type"]]
+        except KeyError:
+            self.__logger.error("Invalid filetype. Re-analyze from path: %s", self.__path)
+            if self.__path is not None:
+                self.__filetype = AssetType.getFromFilename(self.__path)
+            else:
+                self.__filetype = AssetType.kUnknown
+
         if "hash" in jdict:
             self.__hash = jdict["hash"]
         if "enabled" in jdict:

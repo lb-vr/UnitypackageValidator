@@ -10,6 +10,9 @@ from unitypackage import Unitypackage, Asset
 from validators.includes_blacklist import IncludesBlacklist
 from validators.filename_blacklist import FilenameBlacklist
 from validators.modifiable_asset import ModifiableAsset
+from validators.shader_includes import ShaderIncludes
+from validators.reference_whitelist import ReferenceWhitelist
+from validators.shader_namespace import ShaderNamespace
 
 
 def validator_main(unitypackage_fpath: str, rule_fpath: str) -> List[Tuple[str, List[str], List[str]]]:
@@ -77,6 +80,9 @@ def validator_main(unitypackage_fpath: str, rule_fpath: str) -> List[Tuple[str, 
             # 4. 残った.shader、.cgincに対して、含まれるIncludesがAssets/からの絶対パスになっていないか
             # 処理が終わるとファイルパスがごっそり変わる
             # シェーダーファイルに対して絶対パスのincludeがあればエラーとする
+            ai = ShaderIncludes(unity_package, rule)
+            ai.run()
+            ret.append(("絶対パスインクルードを含んだシェーダー", ai.getLog(), ai.getNotice()))
 
             # 5. テクスチャファイル、シェーダーファイルに関して、参照されていないものを削除する
             # テクスチャもシェーダーも、unityに取り込んだ時点でコンパイルが走る。重たいので削除する
@@ -84,11 +90,22 @@ def validator_main(unitypackage_fpath: str, rule_fpath: str) -> List[Tuple[str, 
             # 6. 参照先不明なものをエラーとする
             # ここまでとことん削ったが、この後、自己参照・共通アセット参照のいずれでもないアセットを参照エラーとする。
             # ルール名は「reference_whitelist」
+            rw = ReferenceWhitelist(unity_package, rule)
+            rw.run()
+            ret.append(("共通アセット", rw.getLog(), rw.getNotice()))
 
             # 7. 全てのshaderの名前空間を掘り下げる
             # 指定された文字列を頭につけて、名前空間を掘り下げる。
+            sn = ShaderNamespace(unity_package, "ThisIsNamespace")
+            sn.run()
 
             # 8. 全てのアセットのフォルダを、指定された文字列をルートフォルダとするように変更する
+
+            # 9. 再帰的に参照マップを作り、参照マップに乗らなかったものたちは全て削除
+
+            # 10. GUIDの再発行
+            # ハッシュの衝突を防ぐために、変換マップを作成し、共有できるような仕組みを作りたいね
+            # でもそこまでやんなくてもって感じだね
 
             ###########################################################################################
 
@@ -96,15 +113,15 @@ def validator_main(unitypackage_fpath: str, rule_fpath: str) -> List[Tuple[str, 
             # つまり、このアセット群は含めてはいけないもの。
             # ルールとしては、「改変可能で含めても良いアセット」から漏れたものを削除する。
             # ルール名は「permitted_modifing」で、「改変可能、かつ改変時は含めて良いアセット」を指定する
-            #prohibited_modifing = ProhibitedModifing(unity_package, rule)
+            # prohibited_modifing = ProhibitedModifing(unity_package, rule)
             # prohibited_modifing.run()
 
             # 1. 未同梱・参照ファイルのチェック
-            #reference_whitelist = ReferenceWhitelist(unity_package, rule)
+            # reference_whitelist = ReferenceWhitelist(unity_package, rule)
             # reference_whitelist.run()
 
             # 2. 共通アセットが含まれているか
-            #include_common_asset = IncludeCommonAsset(unity_package, rule)
+            # include_common_asset = IncludeCommonAsset(unity_package, rule)
             # include_common_asset.run()
 
             # 残ったアセットをリストアップ

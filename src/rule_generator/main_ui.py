@@ -37,8 +37,13 @@ class MainWindow(QMainWindow):
         self.ui.FileBlacklist_Add.clicked.connect(self.clickedAddFileBlacklist)
         self.ui.FileBlacklist_Del.clicked.connect(self.clickedDeleteFileBlacklist)
         self.ui.IncludesBlacklist_AddPkg.clicked.connect(self.clickedAddIncludesBlacklist)
+        self.ui.IncludesBlacklist_DelPkg.clicked.connect(self.clickedDeleteIncludesBlacklist)
         self.ui.ModifiableAsset_AddPkg.clicked.connect(self.clickedAddModifiableAsset)
+        self.ui.ModifiableAsset_DelPkg.clicked.connect(self.clickedDeleteModifiableAsset)
         self.ui.CommonAsset_AddPkg.clicked.connect(self.clickedAddCommonAsset)
+        self.ui.CommonAsset_DelPkg.clicked.connect(self.clickedDeleteCommonAsset)
+        self.ui.BuiltinCGIncludes_Add.clicked.connect(self.clickedAddBuiltinCGIncludes)
+        self.ui.BuiltinCGIncludes_Del.clicked.connect(self.clickedDeleteBuiltinCGIncludes)
 
         # TreeWidget
         self.ui.IncludesBlacklist_tw.itemChanged.connect(self.itemChangedIncludesBlacklist)
@@ -51,6 +56,8 @@ class MainWindow(QMainWindow):
         self.ui.actionOpen.triggered.connect(self.open)
 
         self.__is_catch_item_changed = True
+
+        self.__before_opened_directory = "/"
 
     @property
     def logger(self) -> logging.Logger:
@@ -68,6 +75,35 @@ class MainWindow(QMainWindow):
 
     def clickedAddCommonAsset(self):
         self.addUnitypackage(self.ui.CommonAsset_tw)
+
+    def clickedAddBuiltinCGIncludes(self):
+        self.logger.debug("Adding built-in cginc files by file browser.")
+        ret = QFileDialog.getOpenFileNames(self, "ビルトインCGIncludesファイルを開く", self.__before_opened_directory,
+                                           "CGInclude (*.cginc *.glslinc)")
+        if ret is not None:
+            if len(ret[0]) > 0:
+                self.__before_opened_directory = os.path.dirname(ret[0][0])
+            for f in ret[0]:
+                # すでに追加されていないか
+                if not self.ui.BuiltinCGIncludes_list.findItems(os.path.basename(f), QtCore.Qt.MatchExactly):
+                    itm: QListWidgetItem = QListWidgetItem(self.ui.BuiltinCGIncludes_list)
+                    itm.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled |
+                                 QtCore.Qt.ItemFlag.ItemIsEditable |
+                                 QtCore.Qt.ItemFlag.ItemIsSelectable)
+                    itm.setText(os.path.basename(f))
+
+    def clickedDeleteBuiltinCGIncludes(self):
+        row: int = self.ui.BuiltinCGIncludes_list.currentRow()
+        self.ui.BuiltinCGIncludes_list.takeItem(row)
+
+    def clickedDeleteIncludesBlacklist(self):
+        self.deleteUnitypackage(self.ui.IncludesBlacklist_tw)
+
+    def clickedDeleteModifiableAsset(self):
+        self.deleteUnitypackage(self.ui.ModifiableAsset_tw)
+
+    def clickedDeleteCommonAsset(self):
+        self.deleteUnitypackage(self.ui.CommonAsset_tw)
 
     def itemChangedIncludesBlacklist(self, itm: QTreeWidgetItem, clm: int):
         self.changedTreeWidgetItem(self.ui.IncludesBlacklist_tw, itm, clm)
@@ -116,21 +152,24 @@ class MainWindow(QMainWindow):
                         if v[1].enabled is not None:
                             if v[1].enabled is False:
                                 item.setCheckState(0, QtCore.Qt.CheckState.Unchecked)
+                        # self.changedTreeWidgetItem(target)
                 if v[0]:
                     _addTreeWidget(upkg_name, item, v[0])
 
-        self.__is_catch_item_changed = False
+        # self.__is_catch_item_changed = False
         _addTreeWidget(unitypackage.name, target_treewidget, {unitypackage.name: pathobj})
-        self.__is_catch_item_changed = True
+        # self.__is_catch_item_changed = True
 
     def addUnitypackage(self, target_treewidget: QTreeWidget):
         """
         実際にUnitypackageを読み込んで、TreeWidgetに登録する
         """
         self.logger.debug("Adding an unitypackage.")
-        ret = QFileDialog.getOpenFileName(self, "ファイルを開く", "/", "Unitypackage (*.unitypackage)")
+        ret = QFileDialog.getOpenFileName(
+            self, "ファイルを開く", self.__before_opened_directory, "Unitypackage (*.unitypackage)")
         if ret[0]:
             unitypackage_fpath = ret[0]
+            self.__before_opened_directory = os.path.dirname(ret[0])
             unity_package: Unitypackage = Unitypackage(os.path.basename(unitypackage_fpath))
 
             # TODO: target_treewidgetのすべての子のdataを調査し、同じunitypackageが既にインポートされていないかチェックする
@@ -229,12 +268,20 @@ class MainWindow(QMainWindow):
         """
         jsonへ出力する
         """
-        items_ok = True
+        error_msg: List[str] = []
         # TODO: ここに値がセットされているかチェック
 
-        ret = QFileDialog.getSaveFileName(self, "ルールファイルを保存", "/", "Json (*.json)")
+        # BRABRA
+
+        if error_msg and for_export:
+            QMessageBox.critical(None, "エラー", "書き出しに不足しているデータがあります\n" + "\n".join(error_msg))
+            return
+
+        ret = QFileDialog.getSaveFileName(self, "ルールファイルを保存", self.__before_opened_directory, "Json (*.json)")
         if not ret[0]:
             return
+
+        self.__before_opened_directory = os.path.dirname(ret[0])
 
         jsonobj = {
             "created_at": "{0:%Y-%m-%d %H:%M:%S}".format(datetime.datetime.now()),
@@ -249,7 +296,8 @@ class MainWindow(QMainWindow):
                 "includes_blacklist": {},
                 "file_blacklist": [],
                 "modifiable_assets": {},
-                "common_assets": {}
+                "common_assets": {},
+                "builtin_cgincludes": []
             }
         }
 
@@ -258,6 +306,7 @@ class MainWindow(QMainWindow):
         self._putList(jsonobj["rules"]["file_blacklist"], self.ui.FileBlacklist_list)
         self._putTree(jsonobj["rules"]["modifiable_assets"], self.ui.ModifiableAsset_tw, for_export)
         self._putTree(jsonobj["rules"]["common_assets"], self.ui.CommonAsset_tw, for_export)
+        self._putList(jsonobj["rules"]["builtin_cgincludes"], self.ui.BuiltinCGIncludes_list)
 
         # Output file
         with open(ret[0], encoding="utf-8", mode="w") as jsonf:
@@ -287,13 +336,15 @@ class MainWindow(QMainWindow):
 
     def open(self):
         """
-        jsonを解析して起こす…
+        jsonを解析して起こす
         """
 
         # 読み込むjsonを取得
-        ret = QFileDialog.getOpenFileName(self, "ルールファイルを開く", "/", "Json (*.json)")
+        ret = QFileDialog.getOpenFileName(self, "ルールファイルを開く", self.__before_opened_directory, "Json (*.json)")
         if not ret[0]:
             return
+
+        self.__before_opened_directory = os.path.dirname(ret[0])
 
         json_obj: dict = {}
         with open(ret[0], encoding="utf-8", mode="r") as jsonf:
@@ -317,3 +368,25 @@ class MainWindow(QMainWindow):
         for k, v in self._gets(json_obj, ["rules", "includes_blacklist"], dict, {}).items():
             upkg = Unitypackage.createFromJsonDict({k: v})
             self.__addUnitypackage(self.ui.IncludesBlacklist_tw, upkg)
+
+        for rule in self._gets(json_obj, ["rules", "file_blacklist"], list, []):
+            itm: QListWidgetItem = QListWidgetItem(self.ui.FileBlacklist_list)
+            itm.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled |
+                         QtCore.Qt.ItemFlag.ItemIsEditable |
+                         QtCore.Qt.ItemFlag.ItemIsSelectable)
+            itm.setText(rule)
+
+        for k, v in self._gets(json_obj, ["rules", "modifiable_assets"], dict, {}).items():
+            upkg = Unitypackage.createFromJsonDict({k: v})
+            self.__addUnitypackage(self.ui.ModifiableAsset_tw, upkg)
+
+        for k, v in self._gets(json_obj, ["rules", "common_assets"], dict, {}).items():
+            upkg = Unitypackage.createFromJsonDict({k: v})
+            self.__addUnitypackage(self.ui.CommonAsset_tw, upkg)
+
+        for rule in self._gets(json_obj, ["rules", "builtin_cgincludes"], list, []):
+            itm: QListWidgetItem = QListWidgetItem(self.ui.BuiltinCGIncludes_list)
+            itm.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled |
+                         QtCore.Qt.ItemFlag.ItemIsEditable |
+                         QtCore.Qt.ItemFlag.ItemIsSelectable)
+            itm.setText(rule)
