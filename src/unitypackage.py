@@ -151,6 +151,11 @@ class Asset:
         Asset.__logger.debug("Asset: %s %s (%s) included %d reference(s).",
                              self.filetype.name, self.guid, self.path, len(self.references))
 
+    def updatePath(self):
+        # get pathname
+        with open(self.path_fpath, mode="r") as fp:
+            self.__path = fp.readline().strip()
+
     def delete(self):
         if not self.deleted:
             self.__deleted = True

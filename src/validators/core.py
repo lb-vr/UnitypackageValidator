@@ -13,9 +13,10 @@ from validators.modifiable_asset import ModifiableAsset
 from validators.shader_includes import ShaderIncludes
 from validators.reference_whitelist import ReferenceWhitelist
 from validators.shader_namespace import ShaderNamespace
+from validators.path_namespace import PathNamespace
 
 
-def validator_main(unitypackage_fpath: str, rule_fpath: str) -> List[Tuple[str, List[str], List[str]]]:
+def validator_main(unitypackage_fpath: str, rule_fpath: str, id_string: str) -> List[Tuple[str, List[str], List[str]]]:
 
     ret: List[Tuple[str, List[str], List[str]]] = []
 
@@ -94,14 +95,16 @@ def validator_main(unitypackage_fpath: str, rule_fpath: str) -> List[Tuple[str, 
             rw.run()
             ret.append(("共通アセット", rw.getLog(), rw.getNotice()))
 
-            # 7. 全てのshaderの名前空間を掘り下げる
+            # 7. 再帰的に参照マップを作り、参照マップに乗らなかったものたちは全て削除
+
+            # 8. 全てのshaderの名前空間を掘り下げる
             # 指定された文字列を頭につけて、名前空間を掘り下げる。
-            sn = ShaderNamespace(unity_package, "ThisIsNamespace")
+            sn = ShaderNamespace(unity_package, id_string)
             sn.run()
 
-            # 8. 全てのアセットのフォルダを、指定された文字列をルートフォルダとするように変更する
-
-            # 9. 再帰的に参照マップを作り、参照マップに乗らなかったものたちは全て削除
+            # 9. 全てのアセットのフォルダを、指定された文字列をルートフォルダとするように変更する
+            pn = PathNamespace(unity_package, id_string)
+            pn.run()
 
             # 10. GUIDの再発行
             # ハッシュの衝突を防ぐために、変換マップを作成し、共有できるような仕組みを作りたいね
