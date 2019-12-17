@@ -31,5 +31,5 @@ if __name__ == "__main__":
 
     else:
         # validator_main("test.unitypackage", "test.json")
-        validator_main(r"c:\Users\shirao\Downloads\testcase2.unitypackage",
+        validator_main(r"c:\Users\shirao\Downloads\testcase_new2.unitypackage",
                        r"D:\vfrontier_rule.json", "65431154313246784234")

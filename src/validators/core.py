@@ -87,9 +87,9 @@ def validator_main(unitypackage_fpath: str, rule_fpath: str, id_string: str) -> 
 
             # 5. テクスチャファイル、シェーダーファイルに関して、参照されていないものを削除する
             # テクスチャもシェーダーも、unityに取り込んだ時点でコンパイルが走る。重たいので削除する
-            fa = FloatingAsset(unity_package)
-            fa.run()
-            ret.append(("参照されていないアセットの削除", fa.getLog(), []))
+            # fa = FloatingAsset(unity_package)
+            # fa.run()
+            # ret.append(("参照されていないアセットの削除", fa.getLog(), []))
 
             # 6. 参照先不明なものをエラーとする
             # ここまでとことん削ったが、この後、自己参照・共通アセット参照のいずれでもないアセットを参照エラーとする。

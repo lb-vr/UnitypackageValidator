@@ -124,7 +124,7 @@ class Asset:
 
     def load(self):
         # get pathname
-        with open(self.path_fpath, mode="r") as fp:
+        with open(self.path_fpath, mode="r", encoding="utf-8") as fp:
             self.__path = fp.readline().strip()
         self.__filetype = AssetType.getFromFilename(self.path)
 
@@ -153,7 +153,7 @@ class Asset:
 
     def updatePath(self):
         # get pathname
-        with open(self.path_fpath, mode="r") as fp:
+        with open(self.path_fpath, mode="r", encoding="utf-8") as fp:
             self.__path = fp.readline().strip()
 
     def delete(self):
