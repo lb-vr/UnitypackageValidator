@@ -31,4 +31,9 @@ if __name__ == "__main__":
 
     else:
         # validator_main("test.unitypackage", "test.json")
+<<<<<<< HEAD
         validator_main(r"W:\testcase1.unitypackage", "test.json", "29310049234")
+=======
+        validator_main(r"c:\Users\shirao\Downloads\testcase2.unitypackage",
+                       r"D:\vfrontier_rule.json", "65431154313246784234")
+>>>>>>> origin/develop

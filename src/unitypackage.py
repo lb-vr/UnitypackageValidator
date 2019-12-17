@@ -5,7 +5,7 @@ import re
 import enum
 import shutil
 import hashlib
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Union
 
 
 #######################################################################################################################
@@ -28,7 +28,7 @@ class AssetType(enum.Enum):
     kTexture = ("png", "jpg", "jpeg", "bmp")
     kHdrTexture = ("exr", "hdr", "tif", "tiff")
     kScene = ("unity",)
-    kShader = ("shader", "cginc")
+    kShader = ("shader", "cginc", "glslinc")
     kMaterial = ("mat",)
     kModel = ("fbx", "obj")
     kAnimation = ("anim", "controller")
@@ -76,6 +76,7 @@ class Asset:
         self.__filetype: Optional[AssetType] = None
         self.__deleted: bool = False
         self.__hash = None
+        self.__enabled: Optional[bool] = None
 
     @property
     def guid(self) -> str:
@@ -104,6 +105,10 @@ class Asset:
     @property
     def hash(self) -> Optional[str]:
         return self.__hash
+
+    @property
+    def enabled(self) -> Optional[bool]:
+        return self.__enabled
 
     @property
     def references(self) -> Optional[List[str]]:
@@ -146,30 +151,59 @@ class Asset:
         Asset.__logger.debug("Asset: %s %s (%s) included %d reference(s).",
                              self.filetype.name, self.guid, self.path, len(self.references))
 
+    def updatePath(self):
+        # get pathname
+        with open(self.path_fpath, mode="r") as fp:
+            self.__path = fp.readline().strip()
+
     def delete(self):
         if not self.deleted:
             self.__deleted = True
             shutil.rmtree(self.root_dpath)
 
-    def toDict(self, with_hash: bool = False) -> Dict[str, Dict[str, Optional[str]]]:
+    def toDict(self, with_hash: bool = False, enabled: Optional[bool] = None) -> Dict[str, dict]:
         # Noneチェック
         assert self.path, '"path" must not be None. Did you call load() function?'
         assert self.filetype, '"filetype" must not be None. Did you call load() function?'
         assert not self.deleted, "This asset[{}] is deleted.".format(str(self))
 
         # 戻り値
-        ret: Dict[str, Dict[str, Optional[str]]] = {
+        ret: Dict[str, dict] = {
             self.guid: {
                 "guid": self.guid,
                 "path": self.path,
                 "type": self.filetype.name
             }
         }
+        if enabled is not None:
+            ret[self.guid]["enabled"] = enabled
 
         # ハッシュ生成
         if with_hash:
             ret[self.guid]["hash"] = self.hash
 
+        return ret
+
+    def __putFromJson(self, jdict: dict):
+        self.__path = jdict["path"]
+        try:
+            self.__filetype = AssetType[jdict["type"]]
+        except KeyError:
+            self.__logger.error("Invalid filetype. Re-analyze from path: %s", self.__path)
+            if self.__path is not None:
+                self.__filetype = AssetType.getFromFilename(self.__path)
+            else:
+                self.__filetype = AssetType.kUnknown
+
+        if "hash" in jdict:
+            self.__hash = jdict["hash"]
+        if "enabled" in jdict:
+            self.__enabled = jdict["enabled"]
+
+    @classmethod
+    def createFromJsonDict(cls, jdict: dict):
+        ret = Asset(jdict["guid"], "")
+        ret.__putFromJson(jdict)
         return ret
 
     def __str__(self) -> str:
@@ -236,6 +270,18 @@ class Unitypackage:
                 ret[self.name].update(asset.toDict(with_hash))
 
         return ret
+
+    def __putAssetFromJson(self, jdict: dict):
+        for uuid, jasset in jdict.items():
+            self.__assets[uuid] = Asset.createFromJsonDict(jasset)
+
+    @classmethod
+    def createFromJsonDict(cls, jdict: dict):
+        assert len(list(jdict.keys())) == 1
+        unitypackage_title = list(jdict.keys())[0]
+        upkg: Unitypackage = Unitypackage(unitypackage_title)
+        upkg.__putAssetFromJson(jdict[unitypackage_title])
+        return upkg
 
     @classmethod
     def extract(cls, unitypackage_fpath: str, destination_dpath: str):

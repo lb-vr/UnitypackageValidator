@@ -1,6 +1,4 @@
 import logging
-import re
-import os
 
 from typing import Dict, Tuple, List
 from .validator_base import ValidatorBase
@@ -53,9 +51,10 @@ class ModifiableAsset(ValidatorBase):
                             ast.delete()
                             self.appendLog("改変可能な共通アセットで、未改変なTextureが存在したため、削除しました。", itm[1])
                             self.logger.warning("[ FIX ] Deleted TEXTURE because of no modified. %s", itm[1])
-                    if ast.filetype == AssetType.kShader:
+                    # if ast.filetype == AssetType.kShader:
                         # シェーダーのインクルード検索処理
-                        ret = self.checkShaderIncludes(ast)
+                        # self.checkShaderIncludes(ast)
+                pass
             else:
                 # 未改変
                 # 全て消す
@@ -64,36 +63,4 @@ class ModifiableAsset(ValidatorBase):
                     self.appendLog("改変可能な共通アセットで、未改変なunitypackageが存在したため、削除しました。", itm[1])
                     self.logger.warning("[ FIX ] Deleted asset because of no modified. %s", itm[1])
 
-        return ret
-
-        def checkShaderIncludes(self, target_asset: Asset, encoding: str = "utf-8") -> bool:
-            ret = True
-            try:
-                with open(target_asset.data_fpath, mode="r", encoding=encoding) as sf:
-                    includes: List[str] = re.findall(r'#include "(?P<include_path>[^"]+)"', sf.read())
-                    dirnm: str = os.path.dirname(target_asset.path)
-                    for inc in includes:
-                        p = os.path.normpath(os.path.join(dirnm, inc)).replace("\\", "/")
-                        self.logger.debug("Looking for include cginc : %s", p)
-                        # このpのパスであるcgincを探す
-                        for aitm in self.unitypackage.assets.values():
-                            if aitm.path == p:
-                                self.logger.debug("Include file is found.")
-                                break
-                        else:
-                            # 見つからなかったのでエラー
-                            ret = False
-                            self.logger.warning("Include cginc file is not found.")
-                            self.appendLog("必要なcgincファイルが見つかりません。シェーダー改変後は読み込んでいるcgincも一緒に同梱する必要があります。")
-
-            except UnicodeDecodeError:
-                if encoding == "utf-8":
-                    self.appendNotice("このシェーダーファイルはutf-8として不正な文字が含まれていました。Shift-jisでリトライします。", target_asset)
-                    self.logger.warning("This shader is not utf-8 OMG. %s", target_asset)
-                    return self.checkShaderIncludes(target_asset, "sjis")
-                else:
-                    self.appendNotice("このシェーダーファイルはエンコードエラーで読み取りができませんでした", target_asset)
-                    self.logger.warning("This shader is not shift-jis too WTF!? %s", target_asset)
-                    return False
-
-            return ret
+        return True

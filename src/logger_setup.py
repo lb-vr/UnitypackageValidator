@@ -16,7 +16,7 @@ def setupLogger(file_prefix: str, stderr_level=logging.INFO, logfile_level=loggi
 
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('[%(levelname)-7s] %(asctime)s::<%(name)s> | %(message)s')
+    formatter = logging.Formatter('[%(levelname)-7s] %(asctime)s::%(name)-24s | %(message)s')
 
     # stderr
     stderr_handler = logging.StreamHandler()
