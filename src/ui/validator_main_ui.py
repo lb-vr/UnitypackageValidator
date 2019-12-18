@@ -75,7 +75,6 @@ class MainWindow(QMainWindow):
         self.ui.progressBar.setValue(value)
 
     def finishedValidating(self, ret):
-        print(ret)
         # 結果を文字で出す
         message = ""
         for header, logs, notices in ret[0]:
@@ -120,7 +119,8 @@ class MainWindow(QMainWindow):
         self.validator.progress.connect(self.updateProgress)
         self.validator.start()
 
-    def __addUnitypackage(self, target_treewidget: QTreeWidget, unitypackage: Unitypackage, show_delete: bool):
+    def __addUnitypackage(self, target_treewidget: QTreeWidget, unitypackage: Unitypackage, show_delete: bool,
+                          show_old_guid: Optional[int] = None, show_new_guid: Optional[int] = None):
         # ----------------------------------------------
         # unitypackageのアセットをパスの形に直す
         # 再帰的解析
@@ -159,7 +159,7 @@ class MainWindow(QMainWindow):
                 if v[0]:
                     _addTreeWidget(upkg_name, item, v[0])
 
-        _addTreeWidget(unitypackage.name, target_treewidget, pathobj[0])
+        _addTreeWidget(unitypackage.name, target_treewidget, pathobj[0], show_old_guid, show_new_guid)
 
 
 def validator_main_ui(args):
