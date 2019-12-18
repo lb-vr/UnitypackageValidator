@@ -9,7 +9,6 @@ from rule_generator.main_ui import MainWindow
 
 
 def rule_generator_main():
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
     # アプリケーション作成
     app = QApplication(sys.argv)

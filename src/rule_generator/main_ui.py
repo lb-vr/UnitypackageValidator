@@ -26,7 +26,7 @@ class MainWindow(QMainWindow):
 
         # UI初期化処理
         super(MainWindow, self).__init__(parent)
-        self.ui = QUiLoader().load(os.path.abspath('../../ui/rule_generator3.ui'))
+        self.ui = QUiLoader().load(os.path.abspath('ui/rule_generator3.ui'))
         self.setCentralWidget(self.ui)
         self.setWindowTitle('Rule Generator v0.0.1')
 

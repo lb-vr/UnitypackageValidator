@@ -17,16 +17,20 @@ def main():
     parser.add_argument('-b', '--batch', help='work on batch mode.', action='store_true')
     parser.add_argument('-q', '--quiet', help='mute stdout flag.', action='store_true')
     parser.add_argument('-i', '--import-packages', help='common asset unitypackage(s).', nargs='*', default=[])
-    parser.add_argument('-o', '--output', help='output validating result formatted json.', type=str, default='result.json')
+    parser.add_argument('-o', '--output', help='output validating result formatted json.',
+                        type=str, default='result.json')
     parser.add_argument('-s', '--settings', help='filepath of settings file.', type=str, default='settings.toml')
     parser.add_argument('-a', '--author', help='author name', type=str, default=getpass.getuser())
-    parser.add_argument('-r', '--rule', help='URL of rule file. If you specified, overwrite rule url settings.', type=str, default='')
+    parser.add_argument(
+        '-r', '--rule', help='URL of rule file. If you specified, overwrite rule url settings.', type=str, default='')
     # parser.add_argument('-rd', '--redirect', help='redirect output json string to stdout.', action='store_true')
-    parser.add_argument('-l', '--log', help='select log level of stderr. default is "error"', choices=['debug', 'info', 'warn', 'error'], default='error')
+    parser.add_argument('-l', '--log', help='select log level of stderr. default is "error"',
+                        choices=['debug', 'info', 'warn', 'error'], default='error')
     args = parser.parse_args()
 
     # setup logger
-    lg = logger_setup.setupLogger('unitypackage-validator', {'debug': logging.DEBUG, 'info': logging.INFO, 'warn': logging.WARN, 'error': logging.ERROR}[args.log])
+    lg = logger_setup.setupLogger(
+        'unitypackage-validator', {'debug': logging.DEBUG, 'info': logging.INFO, 'warn': logging.WARN, 'error': logging.ERROR}[args.log])
 
     # opening log
     lg.info('Unitypackage Validator version 0.0.1')

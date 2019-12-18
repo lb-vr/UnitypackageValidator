@@ -6,18 +6,17 @@ import os
 from unitypackage import AssetType, Asset, Unitypackage
 
 from typing import List
+from validators.validator_base import ValidatorBase
 
 
-class ReferenceTree:
-    __logger = logging.getLogger("ReferenceTree")
-
+class ReferenceTree(ValidatorBase):
     def __init__(self, unitypackage, namespace: str):
+        super().__init__("", unitypackage, None)
         self.__unitypackage: Unitypackage = unitypackage
         self.__namespace: str = namespace
-        self.__logger = ReferenceTree.__logger
 
-    def run(self) -> bool:
-        self.__logger.info("Modifing ReferenceTree.")
+    def doIt(self) -> bool:
+        self.logger.info("Modifing ReferenceTree.")
 
         def _traversal(asset: Asset, unitypackage: Unitypackage, traversaled_list: List[str]):
             ret = {}
@@ -41,9 +40,17 @@ class ReferenceTree:
             if self.__namespace + ".prefab" in asset.path:
                 # if "kaden_sporadic-e.prefab" in asset.path:
                 if tree:
-                    self.__logger.warning("[FATAL] There are some {}.prefab".format(self.__namespace))
+                    self.logger.warning("[FATAL] There are some {}.prefab".format(self.__namespace))
+                    self.appendLog("指定されたIDのprefabが複数存在しています")
                     return False
                 tree[asset] = _traversal(asset, self.__unitypackage, [asset.guid])
+
+        if len(tree) == 0:
+            self.appendLog("指定されたIDのprefabが一つも存在しません")
+            self.logger.warning("[FATAL] There is no %s.prefab", self.__namespace)
+            for asset in self.unitypackage.assets.values():
+                asset.delete()
+            return False
 
         def _show(dct: dict):
             ret: dict = {}
@@ -51,11 +58,11 @@ class ReferenceTree:
                 ret[k.path] = _show(v)
             return ret
 
-        self.__logger.debug("Show Reference Tree ====")
+        self.logger.debug("Show Reference Tree ====")
         json_strs = json.dumps(_show(tree), indent=4).splitlines()
         for line in json_strs:
-            self.__logger.debug("RefTree > %s", line)
-        self.__logger.debug("====")
+            self.logger.debug("RefTree > %s", line)
+        self.logger.debug("====")
 
         # リファレンスをもとに削除
         def _search(dct: dict, target: Asset) -> bool:
@@ -70,7 +77,8 @@ class ReferenceTree:
             if asset.deleted:
                 continue
             if not _search(tree, asset):
-                self.__logger.warning("[ FIX ] Deleted no referenced file. %s", asset)
+                self.logger.warning("[ FIX ] Deleted no referenced file. %s", asset)
+                self.appendNotice("参照されていないファイルを削除しました", asset)
                 asset.delete()
 
         return True
@@ -79,7 +87,7 @@ class ReferenceTree:
         ret: List[Asset] = []
         try:
             with open(target_asset.data_fpath, mode="r", encoding=encoding) as sf:
-                self.__logger.debug("- Checking shader file. %s", target_asset)
+                self.logger.debug("- Checking shader file. %s", target_asset)
 
                 shader_body = sf.read()
                 while True:
@@ -95,7 +103,7 @@ class ReferenceTree:
                 includes: List[str] = re.findall(r'^\s*#include "(?P<include_path>[^"]+)"', shader_body, re.MULTILINE)
                 dirnm: str = os.path.dirname(target_asset.path)
                 for inc in includes:
-                    self.__logger.debug("-- includes: %s", inc)
+                    self.logger.debug("-- includes: %s", inc)
 
                     # インクルード先が含まれているか
                     p = os.path.normpath(os.path.join(dirnm, inc.lower())).replace("\\", "/")
@@ -104,16 +112,16 @@ class ReferenceTree:
                         tmp[-1] = tmp[-1].lower()
 
                         if "/".join(tmp) == p:
-                            self.__logger.debug("- Found required cginc file. %s includes %s.", target_asset.path, p)
+                            self.logger.debug("- Found required cginc file. %s includes %s.", target_asset.path, p)
                             ret.append(aitm)
                             break  # found
 
         except UnicodeDecodeError:
             if encoding == "utf-8":
-                self.__logger.warning("This shader is not utf-8 OMG. %s", target_asset)
+                self.logger.warning("This shader is not utf-8 OMG. %s", target_asset)
                 return self.extractShaderIncludes(target_asset, "sjis")
             else:
-                self.__logger.warning("This shader is not shift-jis too, WTF!? %s", target_asset)
+                self.logger.warning("This shader is not shift-jis too, WTF!? %s", target_asset)
                 return []
 
         return ret
