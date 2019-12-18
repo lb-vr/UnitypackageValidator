@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 import tempfile
 import json
@@ -14,6 +15,7 @@ from validators.shader_includes import ShaderIncludes
 from validators.reference_whitelist import ReferenceWhitelist
 from validators.shader_namespace import ShaderNamespace
 from validators.path_namespace import PathNamespace
+from validators.reference_tree import ReferenceTree
 
 
 def validator_main(unitypackage_fpath: str, rule_fpath: str, id_string: str) -> List[Tuple[str, List[str], List[str]]]:
@@ -28,24 +30,33 @@ def validator_main(unitypackage_fpath: str, rule_fpath: str, id_string: str) -> 
         print(tmpdir)
         # extract dir
         try:
+            print("extracting tar.")
             Unitypackage.extract(unitypackage_fpath, tmpdir)
 
             # set instance
+            print("initializing unitypackage instance.")
             unity_package = Unitypackage(os.path.basename(unitypackage_fpath))
 
             # load
+            print("loading unitypackage.")
             unity_package.load(tmpdir)
 
             # unitypackageの準備はできた
 
             # load rule
+            print("loading rulefile.")
             rule: dict = {}
             with open(os.path.abspath(rule_fpath), mode="r", encoding="utf-8") as jf:
                 rule = json.load(jf)
 
+            print("ReferenceTree...")
+            rt = ReferenceTree(unity_package, id_string)
+            rt.run()
+
             # 1. 含んではいけないアセット
             # つまり、再配布禁止なもの、VRCSDK、アセットストアのもの、など。
             # ルール名は「includes_blacklist」
+            print("IncludesBlacklist...")
             ib = IncludesBlacklist(unity_package, rule)
             ib.run()
             ret.append(("含んではいけないアセット", ib.getLog(), ib.getNotice()))
@@ -55,6 +66,7 @@ def validator_main(unitypackage_fpath: str, rule_fpath: str, id_string: str) -> 
             # ルール名は「filename_blacklist」
             # ファイル名は正規表現でマッチングを行う。
             # 例えば、.cs（スクリプトファイル）, *.dll, *.exe, *.blend, *.mb, *.maなど？
+            print("FilenameBlacklist...")
             fb = FilenameBlacklist(unity_package, rule)
             fb.run()
             ret.append(("含んではいけないファイル", fb.getLog(), fb.getNotice()))
@@ -74,6 +86,7 @@ def validator_main(unitypackage_fpath: str, rule_fpath: str, id_string: str) -> 
 
             # 3-2 それらがTextureだった場合
             # 未改変なtextureは削除する
+            print("ModifiableAsset...")
             ma = ModifiableAsset(unity_package, rule)
             ma.run()
             ret.append(("改変可能な共通アセット", ma.getLog(), ma.getNotice()))
@@ -81,6 +94,7 @@ def validator_main(unitypackage_fpath: str, rule_fpath: str, id_string: str) -> 
             # 4. 残った.shader、.cgincに対して、含まれるIncludesがAssets/からの絶対パスになっていないか
             # 処理が終わるとファイルパスがごっそり変わる
             # シェーダーファイルに対して絶対パスのincludeがあればエラーとする
+            print("ShaderIncludes...")
             ai = ShaderIncludes(unity_package, rule)
             ai.run()
             ret.append(("絶対パスインクルードを含んだシェーダー", ai.getLog(), ai.getNotice()))
@@ -94,6 +108,7 @@ def validator_main(unitypackage_fpath: str, rule_fpath: str, id_string: str) -> 
             # 6. 参照先不明なものをエラーとする
             # ここまでとことん削ったが、この後、自己参照・共通アセット参照のいずれでもないアセットを参照エラーとする。
             # ルール名は「reference_whitelist」
+            print("ReferenceWhitelist...")
             rw = ReferenceWhitelist(unity_package, rule)
             rw.run()
             ret.append(("共通アセット", rw.getLog(), rw.getNotice()))
@@ -102,10 +117,12 @@ def validator_main(unitypackage_fpath: str, rule_fpath: str, id_string: str) -> 
 
             # 8. 全てのshaderの名前空間を掘り下げる
             # 指定された文字列を頭につけて、名前空間を掘り下げる。
+            print("ShaderNamespace...")
             sn = ShaderNamespace(unity_package, id_string)
             sn.run()
 
             # 9. 全てのアセットのフォルダを、指定された文字列をルートフォルダとするように変更する
+            print("PathNamespace...")
             pn = PathNamespace(unity_package, id_string)
             pn.run()
 
@@ -131,12 +148,16 @@ def validator_main(unitypackage_fpath: str, rule_fpath: str, id_string: str) -> 
             # include_common_asset.run()
 
             # 残ったアセットをリストアップ
-            print("=======================================================")
+            print("=======================================================", file=sys.stderr)
             for asset in unity_package.assets.values():
                 if not asset.deleted:
-                    print(asset)
+                    print(asset, file=sys.stderr)
+
+            # unitypackageにパッキングし直し
+            print("packing...")
+            unity_package.pack(tmpdir, "W:\\result.unitypackage")
 
         except FileNotFoundError as e:
-            print(e)
+            print(e, file=sys.stderr)
 
     return ret

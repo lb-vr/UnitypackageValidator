@@ -22,8 +22,11 @@ class IncludesBlacklist(ValidatorBase):
                     rule_path = upkg[asset.guid]["path"]
                     self.logger.debug("-- The path of rule asset is %s", rule_path)
 
-                    # ルートを動かしていても無駄よ、という抵抗
-                    rule_path = rule_path[7:]  # Assets/ を抜く
+                    # アセットルートフォルダが同名なら削除
+                    tmp = rule_path.split("/")
+                    rule_path = rule_path[7:]
+                    if len(tmp) > 2:
+                        rule_path = tmp[2]
 
                     # チェック
                     if rule_path in asset.path:
@@ -33,8 +36,9 @@ class IncludesBlacklist(ValidatorBase):
                         break
                     else:
                         self.appendNotice("同梱不可のアセットと同じGUIDが見つかりましたが、パスが不一致なため保留されました。", asset)
-                        self.logger.debug(
+                        self.logger.warning(
                             "[ NTC ] No action because test asset and rule asset are different asset path.")
+
             else:
                 self.logger.debug("[ O K ] %s", asset)
 

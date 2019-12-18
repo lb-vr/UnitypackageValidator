@@ -34,7 +34,7 @@ class ModifiableAsset(ValidatorBase):
         # 改変・非改変をチェック
         for upkg_name, assets_pair in modified_list.items():
             modified = False
-            self.logger.debug("Is modifing : Unitypackage = %s", upkg_name)
+            self.logger.debug("Checking modifing : Unitypackage = %s", upkg_name)
             for guid, itm in assets_pair.items():
                 if itm[0]["hash"] != itm[1].hash:
                     self.logger.debug("- Found modified asset. %s", itm[1])
@@ -42,6 +42,7 @@ class ModifiableAsset(ValidatorBase):
 
             if modified:
                 # 改変済み
+                self.logger.debug("Found modified assets on %s", upkg_name)
                 for _, itm in assets_pair.items():
                     ast: Asset = itm[1]
                     if ast.filetype == AssetType.kTexture or ast.filetype == AssetType.kHdrTexture:
@@ -58,6 +59,7 @@ class ModifiableAsset(ValidatorBase):
             else:
                 # 未改変
                 # 全て消す
+                self.logger.debug("There is any modified assets on %s", upkg_name)
                 for _, itm in assets_pair.items():
                     itm[1].delete()
                     self.appendLog("改変可能な共通アセットで、未改変なunitypackageが存在したため、削除しました。", itm[1])

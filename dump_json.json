@@ -1,0 +1,100 @@
+{
+    "Assets/WhiteAtelier_White/65431154313246784234.prefab": {
+        "Assets/WhiteAtelier_White/textures/ReflectionProbe-2.exr": {},
+        "Assets/WhiteAtelier_White/models/Materials/booth_stencil_mask_mtl.mat": {
+            "Assets/WhiteAtelier_White/shaders/StencilMask.shader": {}
+        },
+        "Assets/WhiteAtelier_White/models/Materials/AnnomaLight_Body_Mtl.mat": {
+            "Assets/WhiteAtelier_White/shaders/AvatarUnlit.shader": {},
+            "Assets/WhiteAtelier_White/textures/Annoma_Combined_Tex_Booth.png": {},
+            "Assets/WhiteAtelier_White/textures/AnnomaAtlased_emission.png": {},
+            "Assets/WhiteAtelier_White/textures/AnnomaAtlased_outline.png": {}
+        },
+        "Assets/WhiteAtelier_White/models/booth_outbounds_geo.fbx": {
+            "Assets/WhiteAtelier_White/models/Materials/booth_stencil_mask_mtl.mat": {
+                "Assets/WhiteAtelier_White/shaders/StencilMask.shader": {}
+            }
+        },
+        "Assets/DynamicBone/Scripts/DynamicBone.cs": {},
+        "Assets/WhiteAtelier_White/models/Materials/booth_skybox_mtl.mat": {
+            "Assets/WhiteAtelier_White/textures/umhlanga_sunrise_2k.jpg": {},
+            "Assets/WhiteAtelier_White/textures/winter_river_2k.jpg": {},
+            "Assets/WhiteAtelier_White/shaders/SkyboxPlaneGlound2rket.shader": {},
+            "Assets/WhiteAtelier_White/textures/background_1.png": {},
+            "Assets/WhiteAtelier_White/textures/skybox2.png": {}
+        },
+        "Assets/WhiteAtelier_White/animations/Annoma_3.controller": {
+            "Assets/WhiteAtelier_White/animations/idle_left.anim": {}
+        },
+        "Assets/WhiteAtelier_White/models/booth_colidar_geo.fbx": {},
+        "Assets/VRCSDK/Dependencies/VRChat/VRCSDK2.dll": {},
+        "Assets/WhiteAtelier_White/models/booth_inside_geo2.fbx": {
+            "Assets/WhiteAtelier_White/models/Materials/booth_mtl.mat": {
+                "Assets/WhiteAtelier_White/textures/inside_texture_1.png": {},
+                "Assets/WhiteAtelier_White/shaders/StencilOutStandard2.shader": {}
+            },
+            "Assets/WhiteAtelier_White/models/Materials/glass_mtl.mat": {
+                "Assets/WhiteAtelier_White/textures/inside_texture_1.png": {},
+                "Assets/WhiteAtelier_White/shaders/StencilOutUnlitTp.shader": {}
+            }
+        },
+        "Assets/WhiteAtelier_White/models/Materials/AnnnomaLight_BodyStmsk_Mtl.mat": {
+            "Assets/WhiteAtelier_White/shaders/AvatarUnlitStencilMask.shader": {},
+            "Assets/WhiteAtelier_White/textures/Annoma_Combined_Tex_Booth.png": {}
+        },
+        "Assets/WhiteAtelier_White/animations/SkyboxAnimator.controller": {
+            "Assets/WhiteAtelier_White/animations/SwitchTex0.anim": {},
+            "Assets/WhiteAtelier_White/animations/SwitchTex1.anim": {},
+            "Assets/WhiteAtelier_White/animations/SwitchTex2.anim": {}
+        },
+        "Assets/WhiteAtelier_White/sub-prefab/AnnomaLightMeshB-mesh.asset": {},
+        "Assets/WhiteAtelier_White/models/Materials/AnnomaLight_BodyStout_Mtl.mat": {
+            "Assets/WhiteAtelier_White/shaders/AvatarUnlitStencilOut.shader": {},
+            "Assets/WhiteAtelier_White/textures/Annoma_Combined_Tex_Booth.png": {}
+        },
+        "Assets/WhiteAtelier_White/models/Materials/black_unlit_mtl.mat": {
+            "Assets/WhiteAtelier_White/shaders/StencilOutUnlitTexCullOff.shader": {}
+        },
+        "Assets/WhiteAtelier_White/models/Materials/booth_mtl.mat": {
+            "Assets/WhiteAtelier_White/textures/inside_texture_1.png": {},
+            "Assets/WhiteAtelier_White/shaders/StencilOutStandard2.shader": {}
+        },
+        "Assets/WhiteAtelier_White/sub-prefab/AnnomaLightMeshA-mesh.asset": {},
+        "Assets/WhiteAtelier_White/models/Materials/booth_main_mtl.mat": {
+            "Assets/WhiteAtelier_White/textures/booth_outbuilding_geo_painting_booth_main_mtl_Emission.png": {},
+            "Assets/WhiteAtelier_White/textures/booth_outbuilding_geo_painting_booth_main_mtl_Height.png": {},
+            "Assets/WhiteAtelier_White/textures/booth_outbuilding_geo_painting_booth_main_mtl_MetallicSmoothness.png": {},
+            "Assets/WhiteAtelier_White/textures/booth_outbuilding_geo_painting_booth_main_mtl_Normal.png": {},
+            "Assets/WhiteAtelier_White/shaders/StencilOutStandard.shader": {},
+            "Assets/WhiteAtelier_White/textures/booth_outbuilding_geo_painting_booth_main_mtl_AlbedoTransparency.png": {}
+        },
+        "Assets/WhiteAtelier_White/models/Annoma_model_v1_0_LightA.fbx": {},
+        "Assets/WhiteAtelier_White/animations/Annoma_2.controller": {
+            "Assets/WhiteAtelier_White/animations/idle_right.anim": {}
+        },
+        "Assets/WhiteAtelier_White/models/booth_outbuilding_geo.fbx": {
+            "Assets/WhiteAtelier_White/models/Materials/booth_main_mtl.mat": {
+                "Assets/WhiteAtelier_White/textures/booth_outbuilding_geo_painting_booth_main_mtl_Emission.png": {},
+                "Assets/WhiteAtelier_White/textures/booth_outbuilding_geo_painting_booth_main_mtl_Height.png": {},
+                "Assets/WhiteAtelier_White/textures/booth_outbuilding_geo_painting_booth_main_mtl_MetallicSmoothness.png": {},
+                "Assets/WhiteAtelier_White/textures/booth_outbuilding_geo_painting_booth_main_mtl_Normal.png": {},
+                "Assets/WhiteAtelier_White/shaders/StencilOutStandard.shader": {},
+                "Assets/WhiteAtelier_White/textures/booth_outbuilding_geo_painting_booth_main_mtl_AlbedoTransparency.png": {}
+            }
+        },
+        "Assets/WhiteAtelier_White/models/Materials/glass_mtl.mat": {
+            "Assets/WhiteAtelier_White/textures/inside_texture_1.png": {},
+            "Assets/WhiteAtelier_White/shaders/StencilOutUnlitTp.shader": {}
+        },
+        "Assets/WhiteAtelier_White/models/Materials/test.mat": {
+            "Assets/Toon/Shader/Toon_DoubleShadeWithFeather.shader": {
+                "Assets/Toon/Shader/UCTS_Outline.cginc": {},
+                "Assets/Toon/Shader/UCTS_DoubleShadeWithFeather.cginc": {},
+                "Assets/Toon/Shader/UCTS_ShadowCaster.cginc": {}
+            }
+        },
+        "Assets/WhiteAtelier_White/animations/Annoma_1.controller": {
+            "Assets/WhiteAtelier_White/animations/idle_center.anim": {}
+        }
+    }
+}

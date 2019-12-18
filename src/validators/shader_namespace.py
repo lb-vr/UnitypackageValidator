@@ -22,7 +22,8 @@ class ShaderNamespace:
                 continue
 
             self.modify(asset)
-            self.__logger.debug("[ FIX ] Modified %s", asset)
+            asset.updateHash()
+            self.__logger.debug("[ FIX ] Modified %s, hash is %s", asset, asset.hash)
 
         return True
 

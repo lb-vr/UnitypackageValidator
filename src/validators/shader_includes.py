@@ -32,7 +32,19 @@ class ShaderIncludes(ValidatorBase):
         try:
             with open(target_asset.data_fpath, mode="r", encoding=encoding) as sf:
                 self.__logger.debug("- Checking shader file. %s", target_asset)
-                includes: List[str] = re.findall(r'#include "(?P<include_path>[^"]+)"', sf.read())
+
+                shader_body = sf.read()
+                while True:
+                    start_pos = shader_body.find("/*")
+                    end_pos = shader_body.find("*/", start_pos)
+                    if start_pos != -1 and end_pos != -1:
+                        shader_body = shader_body[:start_pos] + shader_body[end_pos:]
+                    else:
+                        break
+
+                shader_body = re.sub(r'/\*[^(\*/)]*\*/', '', shader_body)
+
+                includes: List[str] = re.findall(r'^\s*#include "(?P<include_path>[^"]+)"', shader_body, re.MULTILINE)
                 dirnm: str = os.path.dirname(target_asset.path)
                 for inc in includes:
                     self.__logger.debug("-- includes: %s", inc)
@@ -44,9 +56,12 @@ class ShaderIncludes(ValidatorBase):
                         self.__logger.warning("[FATAL] Absolute path is prohibited. %s", target_asset)
 
                     # インクルード先が含まれているか
-                    p = os.path.normpath(os.path.join(dirnm, inc)).replace("\\", "/")
+                    p = os.path.normpath(os.path.join(dirnm, inc.lower())).replace("\\", "/")
                     for aitm in self.unitypackage.assets.values():
-                        if aitm.path == p:
+                        tmp = aitm.path.split("/")
+                        tmp[-1] = tmp[-1].lower()
+
+                        if "/".join(tmp) == p:
                             self.__logger.debug("- Found required cginc file. %s includes %s.", target_asset.path, p)
                             break  # found
                     else:
@@ -57,7 +72,8 @@ class ShaderIncludes(ValidatorBase):
                         else:
                             # Not Found.
                             self.__logger.error(
-                                "[FATAL] Required cginc file is not included in this unitypackage. %s", target_asset)
+                                "[FATAL] Required cginc file %s is not included in this unitypackage. %s",
+                                inc, target_asset)
                             self.appendLog("shaderファイルからインクルードされているcgincファイルが見つかりませんでした", target_asset)
                             self.setFatalError()
 

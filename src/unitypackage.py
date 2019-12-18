@@ -124,20 +124,15 @@ class Asset:
 
     def load(self):
         # get pathname
-        with open(self.path_fpath, mode="r", encoding="utf-8") as fp:
-            self.__path = fp.readline().strip()
+        self.updatePath()
         self.__filetype = AssetType.getFromFilename(self.path)
 
         # calc hash
-        try:
-            with open(self.data_fpath, mode="rb") as asset_data_f:
-                self.__hash = hashlib.sha512(asset_data_f.read()).hexdigest()
-        except FileNotFoundError:
-            pass  # Directory
+        self.updateHash()
 
         # get references
-        meta_ref = Asset.__getReferences(self.meta_fpath)
-        data_ref = Asset.__getReferences(self.data_fpath)
+        meta_ref = Asset.__getReferences(self.meta_fpath, self.guid + "_mt")
+        data_ref = Asset.__getReferences(self.data_fpath, self.guid + "_dt")
         self.__references = meta_ref + data_ref  # Combine
         self.__references = list(set(self.references))
 
@@ -155,6 +150,13 @@ class Asset:
         # get pathname
         with open(self.path_fpath, mode="r", encoding="utf-8") as fp:
             self.__path = fp.readline().strip()
+
+    def updateHash(self):
+        try:
+            with open(self.data_fpath, mode="rb") as asset_data_f:
+                self.__hash = hashlib.sha512(asset_data_f.read()).hexdigest()
+        except FileNotFoundError:
+            pass  # Directory
 
     def delete(self):
         if not self.deleted:
@@ -210,15 +212,19 @@ class Asset:
         return "{0.guid} ({0.path})".format(self)
 
     @classmethod
-    def __getReferences(cls, fpath: str) -> List[str]:
+    def __getReferences(cls, fpath: str, guid="aa") -> List[str]:
         ret: List[str] = []
         guid_regex_rule = re.compile(r"guid: [0-9a-f]{32}")
         try:
+            fstr = ""
             with open(fpath, mode="rt") as f:
                 fstr = f.read()
                 matched_list = guid_regex_rule.findall(fstr)
                 for m in matched_list:
                     ret.append(m[6:])
+
+            with open(r"test\{}.txt".format(guid), mode="w", encoding="utf-8") as f:
+                f.write(fstr)
         except FileNotFoundError:
             pass  # Directory
         except UnicodeDecodeError:
@@ -260,6 +266,20 @@ class Unitypackage:
     @property
     def assets(self) -> Dict[str, Asset]:
         return self.__assets
+
+    def pack(self, working_directory: str, destination: str):
+        # ファイル名の作成
+        tar_filepath = 'archtemp.tar'
+        with tarfile.open(os.path.join(working_directory, tar_filepath), 'w:gz') as tar:
+            self.__logger.debug("Adding directories to tar.")
+            for asset in self.assets.values():
+                if asset.deleted:
+                    continue
+                self.__logger.debug("- Add tar: %s", asset.root_dpath)
+                tar.add(asset.root_dpath, arcname=os.path.basename(asset.root_dpath))
+
+        shutil.move(os.path.join(working_directory, tar_filepath), destination)
+        self.__logger.info("Finished packing the unitypackage. destination = %s", destination)
 
     def toDict(self, with_hash: bool = False) -> Dict[str, Dict[str, Dict[str, str]]]:
         ret: Dict[str, Dict[str, Dict[str, str]]] = {
