@@ -91,7 +91,8 @@ class MainWindow(QMainWindow):
         self.__addUnitypackage(self.ui.twBeforeUnitypackage, ret[1], True)
         self.__addUnitypackage(self.ui.twAfterUnitypackage, ret[2], False, 1)
         self.ui.btValidate.setEnabled(True)
-        pass
+
+        QMessageBox.information(None, "完了", "unitypackageのバリデーションと書き出しが完了しました")
 
     def doIt(self):
         # エラーチェック
@@ -109,12 +110,11 @@ class MainWindow(QMainWindow):
             return
 
         ret = QFileDialog.getExistingDirectory(
-            self, "Unitypackageの保存先を選択", self.__before_opened_directory, "Unitypackage (*.unitypackage)")
-        if not ret[0]:
+            self, "Unitypackageの保存先を選択", self.__before_opened_directory)
+        if not ret:
             return
 
         self.__before_opened_directory = ret[0]
-        self.ui.tbUnitypackageFilepath.setText(ret[0])
 
         # 一度データクリア
         self.ui.twBeforeUnitypackage.clear()
@@ -125,7 +125,8 @@ class MainWindow(QMainWindow):
         # 実行
         self.results = {}
         self.validator = Validator(fpath, self.ui.tbRuleFileUrl.text(),
-                                   self.ui.tbExhibitorId.text(), "result.unitypackage")
+                                   self.ui.tbExhibitorId.text(),
+                                   os.path.join(ret, "{}.unitypackage".format(self.ui.tbExhibitorId.text())))
         self.validator.finishedValidating.connect(self.finishedValidating)
         self.validator.progress.connect(self.updateProgress)
         self.validator.start()

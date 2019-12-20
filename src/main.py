@@ -27,6 +27,7 @@ if __name__ == "__main__":
                         choices=["rt", "ib", "fb", "ma", "si", "sn", "pn", "gr"])
     parser.add_argument("-c", "--config", type=str, help="設定ファイルパス", default="cfg.ini")
     os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
+    # os.chdir(os.path.dirname(os.path.abspath(os.path.join(sys.argv[0], "../"))))
     args = parser.parse_args()
 
     setupLogger("UnitypackageTools", stderr_level=(logging.DEBUG if args.debug else logging.INFO))

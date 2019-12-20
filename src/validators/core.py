@@ -201,7 +201,7 @@ class Validator(QtCore.QThread):
                 # unitypackageにパッキングし直し
                 print("packing...")
                 self.reportProgress(90, "packing...")
-                # unity_package.pack(tmpdir, destination)
+                unity_package.pack(tmpdir, destination)
 
                 self.reportProgress(100, "Finished...")
 
