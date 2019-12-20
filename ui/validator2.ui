@@ -234,16 +234,9 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QPushButton" name="pushButton_4">
+          <widget class="QPushButton" name="btUpload">
            <property name="text">
             <string>アップロードする</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_3">
-           <property name="text">
-            <string>unitypackageをエクスポート</string>
            </property>
           </widget>
          </item>

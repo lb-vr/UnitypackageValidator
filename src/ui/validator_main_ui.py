@@ -20,6 +20,8 @@ from typing import List, Tuple, Optional, Dict, Any
 
 import queue
 
+import webbrowser
+
 from PySide2.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QTreeWidgetItem, QFormLayout, QLineEdit, QLabel
 from PySide2.QtWidgets import QTreeWidget, QSpinBox, QCheckBox, QComboBox, QHBoxLayout, QPushButton, QSizePolicy
 from PySide2.QtWidgets import QListWidgetItem, QProgressBar, QListWidget
@@ -59,6 +61,7 @@ class MainWindow(QMainWindow):
         # シグナル
         self.ui.btOpenUnitypackage.clicked.connect(self.openUnitypackage)
         self.ui.btValidate.clicked.connect(self.doIt)
+        self.ui.btUpload.clicked.connect(lambda: webbrowser.open(ini["upload"]["url"]))
 
         self.validator = None
         self.results = {}
@@ -104,6 +107,14 @@ class MainWindow(QMainWindow):
         if not os.path.exists(fpath) or not os.path.isfile(fpath):
             QMessageBox.critical(None, "エラー", "入力されたUnitypackageが存在しません")
             return
+
+        ret = QFileDialog.getExistingDirectory(
+            self, "Unitypackageの保存先を選択", self.__before_opened_directory, "Unitypackage (*.unitypackage)")
+        if not ret[0]:
+            return
+
+        self.__before_opened_directory = ret[0]
+        self.ui.tbUnitypackageFilepath.setText(ret[0])
 
         # 一度データクリア
         self.ui.twBeforeUnitypackage.clear()
@@ -157,7 +168,7 @@ class MainWindow(QMainWindow):
                         if show_old_guid:
                             item.setText(show_old_guid, asset.guid)
                 if v[0]:
-                    _addTreeWidget(upkg_name, item, v[0])
+                    _addTreeWidget(upkg_name, item, v[0], show_old_guid, show_new_guid)
 
         _addTreeWidget(unitypackage.name, target_treewidget, pathobj[0], show_old_guid, show_new_guid)
 
