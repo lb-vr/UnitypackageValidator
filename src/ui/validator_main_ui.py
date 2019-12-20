@@ -39,7 +39,7 @@ class MainWindow(QMainWindow):
 
         # UI初期化処理
         super(MainWindow, self).__init__(parent)
-        self.ui = QUiLoader().load(os.path.abspath('ui/validator2.ui'))
+        self.ui = QUiLoader().load('ui/validator2.ui')
         self.setCentralWidget(self.ui)
         self.setWindowTitle('Validator v0.0.1')
 
@@ -177,7 +177,6 @@ def validator_main_ui(args):
 
     # アプリケーション作成
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon("icon.png"))
 
     # オブジェクト作成
     window = MainWindow(args)

@@ -12,7 +12,6 @@ def rule_generator_main():
 
     # アプリケーション作成
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon("icon.png"))
 
     # オブジェクト作成
     window = MainWindow()
