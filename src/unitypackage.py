@@ -314,9 +314,11 @@ class Unitypackage:
             logger.debug("- %d file(s) are included.", len(tared_folders))
 
             # check filename
-            regex_rule = re.compile(r"^[0-9a-f]{32}(/asset|/asset.meta|/pathname|/preview.png)?$")
+            regex_rule = re.compile(r"^(./)?[0-9a-f]{32}(/asset|/._asset|/asset.meta|/pathname|/preview.png)?$")
             for tf in tared_folders:
                 logger.debug("-- %s", tf)
+                if tf == ".":
+                    continue
                 if not regex_rule.match(tf):
                     raise InvalidUnitypackageError(reason="Invalid folder name.", unitypackage_fpath=unitypackage_fpath)
 
