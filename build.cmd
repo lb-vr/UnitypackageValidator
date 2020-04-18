@@ -9,8 +9,8 @@ set EXE_PATH=%~dp0exe
 set TOOL_PATH=%~dp0src
 cd %EXE_PATH%
 rem pyinstallerを実行
-pyinstaller %TOOL_PATH%\main.py  --hidden-import=PySide2.QtXml --onefile --clean --icon %ICON_PATH% -n %TOOL_NAME% -p %ADD_PATH%;%TOOL_PATH%
-rem pyinstaller %TOOL_PATH%\main.py --onefile --clean --icon %ICON_PATH% -n %TOOL_NAME%
+pyinstaller %TOOL_PATH%\main.py --hidden-import=PySide2.QtXml --onefile --clean --icon %ICON_PATH% -n %TOOL_NAME%
+rem pyinstaller %TOOL_PATH%\main.py --onefile --clean --icon %ICON_PATH% -n %TOOL_NAME%-p %ADD_PATH%;%TOOL_PATH%
 cd ..
-mkdir %EXE_PATH%\dist\ui
-xcopy ui\*.ui %EXE_PATH%\dist\ui
+rem mkdir %EXE_PATH%\dist\ui
+rem xcopy ui\*.ui %EXE_PATH%\dist\ui

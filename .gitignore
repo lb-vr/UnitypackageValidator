@@ -133,3 +133,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/[D/d]ocument/
+
+vemt-unitypackage-validator/
+vemt-unitypackage-validator*.zip
