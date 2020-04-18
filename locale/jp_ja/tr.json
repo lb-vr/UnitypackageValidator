@@ -1,8 +1,0 @@
-{
-    "arguments": {
-        "work on batch mode.": "バッチモードで実行します。",
-        "output validating result formatted json. Default is no output file.": "ファイル名を指定し、json形式にフォーマットされた結果を出力します。",
-        "filepath of settings file.": "設定ファイルのファイルパス。",
-        "common asset unitypackages. only for ruletool.": "コモンアセットとして使用するunitypackageへのパス。ruletool起動時のみ有効。"
-    }
-}
