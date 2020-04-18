@@ -1,3 +1,4 @@
+@echo off
 rem ツール名を指定する
 set TOOL_NAME=vemt-cket-validator
 set ICON_PATH=%~dp0favicon.ico
