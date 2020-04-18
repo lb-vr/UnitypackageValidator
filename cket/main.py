@@ -57,7 +57,7 @@ def validateOutputDir(_dir: str):
     return _dir
 
 
-if __name__ == "__main__":
+def main_cket():
     parser = argparse.ArgumentParser(description="Unitypackage validator for Cross market.")
     grp = parser.add_mutually_exclusive_group()
     grp.add_argument("-v", "--verbose",
@@ -132,3 +132,7 @@ if __name__ == "__main__":
 
     # main
     main(rule=jsondata, **vars(args))
+
+
+if __name__ == "__main__":
+    main_cket()
