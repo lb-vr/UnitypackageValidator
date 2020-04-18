@@ -67,9 +67,6 @@ def main_cket():
     grp.add_argument("-q", "--quiet",
                      help="quiet mode.",
                      action="store_true")
-    parser.add_argument("-d", "--debug",
-                        help="output debug log.",
-                        action="store_true")
     parser.add_argument("-o", "--output-dir",
                         help="output directory path. default is input directory.",
                         type=validateOutputDir,

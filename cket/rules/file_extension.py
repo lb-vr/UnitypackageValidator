@@ -1,7 +1,7 @@
 from typing import List
 from srolib.unity.unitypackage import Unitypackage
 from cket import exceptions
-from . import BaseRule, Result
+from .base import BaseRule, Result
 from srolib.util import easy_logger
 
 
